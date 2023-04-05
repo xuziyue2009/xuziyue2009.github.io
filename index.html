@@ -11,6 +11,8 @@
             </div> 
             <div id="rizhi" style="background-color:#ced6e0;height:5000px;float: left; width: calc(30%);">
                 <h2>日志</h2>
+                <h3>2023.4.5</h3>
+                <p>游戏，彩蛋更新</p>
                 <h3>2023.4.3</h3>
                 <p>配色，游戏更新</p>
                 <h3>2023.3.31</h3>
@@ -34,6 +36,17 @@
                 <a href="https://cn.bing.com/">bing.com</a>
                 <iframe src="https://voxiom.io/" style="height: 20%; width: 100%;" frameborder = "0"></iframe>
                 <a href="https://voxiom.io/">voxiom.io</a>
+                <br>
+                <input type="password" id="pwd"/>
+                <input type="button" value="确定" onclick="login()"/>
+                <script>
+                    function login(){
+                        var pwd=document.getElementById("pwd").value;
+                        if(pwd=="1919810"){
+                            location.href="song";
+                        }
+                    }
+                </script>
             </div>
 
             <div id="link" style="background-color:#f1f2f6;height:auto;text-align: center;clear: both;">
