@@ -4,39 +4,40 @@
         <meta charset="utf-8">
         <title>xzy的网站</title>
     </head>
-    <body style="text-align:start; background-color: #a4b0be; font-family: Arial, Helvetica, sans-serif;";>
+    <body style="text-align:start; background-color: #a4b0be; font-family: Arial, Helvetica, sans-serif;">
         <div id="container" style="width:auto;height: auto;">
             <div id="header" style="background-color: #f1f2f6;">
                 <h1 style="margin-bottom:0;">xzy的网站</h1>
             </div> 
-            <div id="rizhi" style="background-color:#ced6e0;height:5000px;float: left; width: calc(30%);overflow: auto;">
+            <div id="rizhi" style="background-color:#ced6e0;height:500px;float: left; width: calc(30%);overflow:auto;">
                 <h2>日志</h2>
-                <!-- <h3>2023.4.28</h3>
-                <p>内容更新:可在搜索框直接输入网站</p> -->
-                <h3>2023.4.27</h3>
-                <p>内容更新:gcd=>共产党宣言</p>
-                <h3>2023.4.8</h3>
+                <h3>2023.4.28</h3>
+                <p>预告: 首页内容增加</p>
+                <b>2023.4.27</b>
+                <p>内容更新: gcd=>共产党宣言</p>
+                <b>2023.4.8</b>
                 <p>内容更新</p>
-                <h3>2023.4.5</h3>
-                <p>游戏，彩蛋更新</p>
-                <h3>2023.4.3</h3>
+                <b>2023.4.5</b>
+                <p>游戏更新</p>
+                <b>2023.4.3</b>
                 <p>配色，游戏更新</p>
-                <h3>2023.3.31</h3>
+                <b>2023.3.31</b>
                 <p>+游戏</p>
-                <h3>2023.3.19</h3>
+                <b>2023.3.19</b>
                 <p>布局优化</p>
-                <h3>2023.3.18</h3>
+                <b>2023.3.18</b>
                 <p>小更新</p>
-                <h3>2023.3.17</h3>
+                <b>2023.3.17</b>
                 <p>网站建立了！</p>
             </div>
             
-            <div id="main" style="background-color:#dfe4ea; height:5000px; width: calc(70%); float: left;">
+            <div id="main" style="background-color:#dfe4ea; height:500px; width: calc(70%); float: left;">
                 <h2>主界面</h2>
+                <b>搜索框</b>
                 <input type="password" id="pwd"/>
-                <input type="button" value="确定" onclick="login()"/>
+                <input type="button" value="确定" onclick="enter()"/>
                 <script>
-                    function login(){
+                    function enter(){
                         var pwd=document.getElementById("pwd").value;
                         if(pwd=="game"){
                             location.href="game.html";
@@ -44,12 +45,9 @@
                         else if(pwd=="gmb"){
                             location.href="gambia.html";
                         }
-                        // else if(pwd=="dm"){
-                        //     location.href="flies/猜地名.pptx";
-                        // }
-                        // else if(pwd=="bq"){
-                        //     location.href="flies/宝清(低清).mp4";
-                        // }
+                        else if(pwd=="song"){
+                            location.href="song.html";
+                        }
                         else if(pwd=="gcd"){
                             location.href="https://news.12371.cn/2018/04/24/ARTI1524553638408468.shtml";
                         }
@@ -58,12 +56,17 @@
                         // }
                     }
                 </script>
+                <h3>内容:</h3>
+                <p>game->游戏</p>
+                <p>gmb->冈比亚网站 (未开工)</p>
+                <p>song->《高墙外》</p>
+                <p>gcd->共产党宣言</p>
             </div>
 
             <div id="link" style="background-color:#f1f2f6;height:auto;text-align: center;clear: both;">
                 链接：
                 <!-- <a href="https://17ers-pan.github.io/">17ers在线网盘(未完成)</a> -->
-                <a href="https://bjsdfz17ban.github.io/">吴承坤的网站</a>
+                <a href="https://wchengk09.github.io/">吴承坤的网站</a>
             </div>
 
             <div id="footer" style="background-color:#f1f2f6;clear:both;text-align:center;">
