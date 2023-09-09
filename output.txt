@@ -1,0 +1,28 @@
+
+Welcome to network server by neiwangyun.net  
+current server node : sh3.neiwangyun.net
+----------------------------------------------------------
+Basic Tunnel Information
+  username      : sh
+  type          : anonymous
+  subdomain     : fiikrp65okfhshsh3.neiwangyun.net
+  remote_ip     : 120.244.192.31
+  bandwidth     : 2 Mbps
+  expire_time   : 2 hours
+  unid          : rdhwylwiwbao22xxmwsle...
+----------------------------------------------------------
+Datetime Log
+  create time: 2023-09-03 12:45:07
+----------------------------------------------------------
+Local Server
+  local server: 127.0.0.1:8000
+----------------------------------------------------------
+Access to the Tunnel
+  cname_http    : tunnel not support
+  cname_https   : tunnel not support
+  http          : http://fiikrp65okfhshsh3.neiwangyun.net
+  https         : https://fiikrp65okfhshsh3.neiwangyun.net
+  ipport        : fiikrp65okfhshsh3.neiwangyun.net:15442
+----------------------------------------------------------
+Ctrl+C Exit Process
+  f 
