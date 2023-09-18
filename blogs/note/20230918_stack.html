@@ -8,48 +8,48 @@
     <body>
         栈
         <pre><code>
-            #include <bits/stdc++.h>
-            using namespace std;
-            
-            int s[100010], top;
-            
-            void pop(){
-                if (top == 0){
-                    cout << "empty" << endl;
-                }
-                else{
-                    top--;
-                    cout << s[top] << endl;
-                }
-            }
-            
-            void push(int x){
-                if (top == n){
-                    cout << "full" << endl;
-                }
-                else{
-                    s[top] = x;
-                    top++;-
-                }
-            }
-            
-            int main(){
-                int n, a, b;
-                //n:操作次数 a:操作类型(0:push 1:pull) b:压栈数 
-                
-                cin >> n;
-                
-                for (int i = 1; i <= n; i++){
-                    cin >> a;
-                    if (a){
-                        pull();
-                    }
-                    else{
-                        cin >> b;
-                        push(n);
-                    }
-                }	
-            }
+#include &lt; bits/stdc++.h &gt;
+using namespace std;
+
+int s[100010], top;
+
+void pop(){
+    if (top == 0){
+        cout &lt;&lt; "empty" &lt;&lt; endl;
+    }
+    else{
+        top--;
+        cout &lt;&lt; s[top] &lt;&lt; endl;
+    }
+}
+
+void push(int x){
+    if (top == n){
+        cout &lt;&lt; "full" &lt;&lt; endl;
+    }
+    else{
+        s[top] = x;
+        top++;
+    }
+}
+
+int main(){
+    int n, a, b;
+    //n:操作次数 a:操作类型(0:push 1:pull) b:压栈数 
+    
+    cin &gt;&gt; n;
+    
+    for (int i = 1; i &lt;= n; i++){
+        cin &gt;&gt; a;
+        if (a){
+            pull();
+        }
+        else{
+            cin &gt;&gt; b;
+            push(n);
+        }
+    }	
+}
             <code></pre>
     </body>
 </html>
