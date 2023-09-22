@@ -3,3 +3,10 @@ body{
     background-color: #a4b0be; 
     font-family: Arial, Helvetica, sans-serif;
 }
+#main{
+    background-color:#dfe4ea; 
+    width: calc(70%); 
+    height:100vh; 
+    float: left; 
+    overflow:auto;
+}
