@@ -4,6 +4,10 @@
 
 **/
 
+p{
+    font-family: "宋体", "Comic Sans MS", cursive, sans-serif;
+}
+
 body{
     background-color: #F0F8FF; 
     margin: 0;
@@ -12,7 +16,7 @@ body{
 
 .head{
     background-color: #FAEBD7;
-    height: 90px;
+    height: 120px;
     padding-bottom: 10px;
 }
 
