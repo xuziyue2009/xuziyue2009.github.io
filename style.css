@@ -1,12 +1,53 @@
+/** 基本配色
+背景色
+#F0F8FF #eeeeee #FAEBD7 #191970
+
+**/
+
 body{
-    text-align:start; 
-    background-color: #a4b0be; 
-    font-family: Arial, Helvetica, sans-serif;
+    background-color: #F0F8FF; 
+    margin: 0;
+    text-align: center;
 }
-#main{
-    background-color:#dfe4ea; 
-    width: calc(70%); 
-    height:100vh; 
-    float: left; 
-    overflow:auto;
+
+.head{
+    background-color: #FAEBD7;
+    height: 90px;
+    padding-bottom: 10px;
 }
+
+.main{
+    float: left;
+}
+
+.main.side{
+    background-color: #d5deef;
+    width: 25%;
+    float: right;
+}
+
+.main.middle{
+    background-color: #f5f5e9;
+    width: 75%;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+.foot{
+    background-color: #eeeeee;
+    text-align: center;
+    clear: both;
+}
+
+@media screen and (max-width: 600px) {
+    .main {
+      width: 100%;
+    }
+    .others{
+        width: 100%;
+    }
+  }
