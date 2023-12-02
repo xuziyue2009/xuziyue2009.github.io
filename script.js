@@ -17,5 +17,8 @@ function GetTime(){
     var Time = DoubleNum(h) + ':' + DoubleNum(m) + ':' + DoubleNum(s);
 
     document.getElementById("time").innerHTML = Time;
-    setInterval(function(){GetTime()}, 1000);
+    
+    setTimeout(GetTime, 1000);
 }
+
+GetTime();
