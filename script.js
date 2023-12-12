@@ -1,4 +1,4 @@
-function updateClock(){
+window.onload = function updateClock(){
     var now = new Date();
     var hour = now.getHours();
     var minute = now.getMinutes();
@@ -14,4 +14,4 @@ function updateClock(){
     setTimeout(updateClock, 1000);
 }
 
-updateClock();
+// updateClock();
