@@ -63,6 +63,12 @@ body {
     width: 25%;
     padding-left: 20px;
 }
+
+/* 大栏 */
+.fullcolumn {
+    float: left;
+    width: 100%;
+}
    
 /* 图像部分 */
 .pic {
