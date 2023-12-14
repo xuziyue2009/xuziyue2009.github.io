@@ -17,6 +17,7 @@ body {
     padding: 30px;
     text-align: center;
     background: white;
+    border-radius: 10px;
 }
 
 .header img {
