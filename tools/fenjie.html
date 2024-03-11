@@ -20,17 +20,7 @@
                 var x = document.getElementById("inputx");
                 btn = document.getElementById("button")
                 btn.onclick = function(){
-			        var i = 2;
-                    result = [];
-                    for (var i = 2; i * i <= x; i++){
-                        while (x % i === 0) {
-                            result.push(i);
-                            x = x / i;
-                        }
-                    }
-                    if (x > 1) {
-                        result.push(x)
-                    }
+			        var result = factorize(x);
                     document.getElementById("result").innerHTML = result;
                     alert(result);
                 }
