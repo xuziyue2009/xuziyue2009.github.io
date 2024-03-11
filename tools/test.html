@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			*{
+				padding: 0;
+				margin: 0;
+			}
+			#input1{
+				width: 150px;
+				height: 50px;
+				display: block;
+				margin:  100px auto 0;
+			}
+			#btn{
+				width: 100px;
+				height: 50px;
+				display: block;
+				margin: 0 auto;
+			}
+		</style>
+	</head>
+	<body>
+		<input type="number" name="input1" id="input1" value=""  placeholder="请输入一个数字"/>
+		<input type="button" id="btn" value="判断是否为质数" />
+	</body>
+	<script type="text/javascript">
+		var input1=document.getElementById("input1");
+		btn=document.getElementById("btn");
+		btn.onclick=function(){
+			var count=0;//定义因子数，
+			var num=input1.value-0;
+
+			for( var i = 1 ; i <= num ; i++ ){
+        if( num%i == 0 ){
+            count++;
+        }
+   }
+    if( count == 2 ){//因为质数的因子只有本身和1
+        alert(num+'是质数')
+    }else{
+       alert( num + "不是质数" );
+		}
+    }
+	</script>
+</html>

@@ -46,5 +46,3 @@ window.onload = function updateClock(){
 
     setTimeout(updateClock, 1000);
 }
-
-// updateClock();

@@ -5,8 +5,6 @@
         <title>质数判断器-xzy的网站</title>
         <link rel="shortcut icon" href="xuziyue2009.github.io/favicon.ico"></link>
         <link rel="stylesheet" type="text/css" href="/style.css">
-
-        <script src="script.js"></script>
     </head>
     <body>
         <div class="header">
@@ -16,15 +14,37 @@
 
         <div class="row">
             <div class="fullcolumn">
-                <!-- <div class="card">
-                    <a href="xxxx.html">
-                        <h2>标题1</h2>
-                        <h5>YYYY/MM/DD</h5>
-                        <div class="pic" style="height:200px;">图片</div>
-                        <p>介绍1</p>
-                        <p>介绍2</p>
-                    </a>
-                </div> -->
+                <div class="card">
+                    <h2>输入一个正整数</h2>
+                    <input type="number" min="1" max="2147483647" name="inputx" id="inputx">
+                    <input type="button" id="button" value="判断">
+
+                    <script type="text/javascript">
+                        var x = document.getElementById("inputx");
+                        btn = document.getElementById("button")
+                        btn.onclick = function(){
+			                var flag = true;
+			                var num = x.value - 0;
+
+                            if (num % 2 == 0 && num != 2){
+                                flag = false;
+                            }
+		                    for (var i = 3; i*i <= num ; i+=2){
+                                if (num % i == 0){
+                                    flag = false;
+                                    break;
+                                }
+                            }
+
+                            if (flag){
+                                alert("芝士质数");
+                            }
+                            else{
+                                alert("不是质数");
+                            }
+                        }
+                    </script>
+                </div>
             </div>
         </div>
 
