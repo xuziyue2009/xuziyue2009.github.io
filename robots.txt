@@ -1,0 +1,7 @@
+user-agent: *
+disallow: /song.html
+disallow: /googleee2222916c831694.html
+disallow: /404.html
+disallow: /files/
+disallow: /blogs/
+disallow: /media/
