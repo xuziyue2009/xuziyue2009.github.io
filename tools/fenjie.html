@@ -22,14 +22,14 @@
                 btn.onclick = function(){
 			        var i = 2;
                     result = [];
-                    for (var i = 2; i * i <= num; i++){
-                        while (num % i === 0) {
+                    for (var i = 2; i * i <= x; i++){
+                        while (x % i === 0) {
                             result.push(i);
-                            num = num / i;
+                            x = x / i;
                         }
                     }
-                    if (num > 1) {
-                        result.push(num)
+                    if (x > 1) {
+                        result.push(x)
                     }
                     document.getElementById("result").innerHTML = result;
                     alert(result);
