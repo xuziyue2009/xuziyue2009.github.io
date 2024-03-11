@@ -10,43 +10,42 @@
         <div class="header">
             <h1>质数判断器</h1>
             <p>判断一个数是否是质数</p>
+            <hr>
+            <h2>输入一个正整数</h2>
+            <input type="number" min="1" max="2147483647" name="inputx" id="inputx">
+            <input type="button" id="button" value="判断">
+            <script type="text/javascript">
+                var x = document.getElementById("inputx");
+                btn = document.getElementById("button")
+                btn.onclick = function(){
+			        var flag = true;
+			        var num = x.value - 0;
+                    if (num % 2 == 0 && num != 2){
+                        flag = false;
+                    }
+		            for (var i = 3; i*i <= num ; i+=2){
+                        if (num % i == 0){
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (flag){
+                        alert("芝士质数");
+                    }
+                    else{
+                        alert("不是质数");
+                    }
+                }
+            </script>
         </div>
 
-        <div class="row">
+        <!-- <div class="row">
             <div class="fullcolumn">
                 <div class="card">
-                    <h2>输入一个正整数</h2>
-                    <input type="number" min="1" max="2147483647" name="inputx" id="inputx">
-                    <input type="button" id="button" value="判断">
-
-                    <script type="text/javascript">
-                        var x = document.getElementById("inputx");
-                        btn = document.getElementById("button")
-                        btn.onclick = function(){
-			                var flag = true;
-			                var num = x.value - 0;
-
-                            if (num % 2 == 0 && num != 2){
-                                flag = false;
-                            }
-		                    for (var i = 3; i*i <= num ; i+=2){
-                                if (num % i == 0){
-                                    flag = false;
-                                    break;
-                                }
-                            }
-
-                            if (flag){
-                                alert("芝士质数");
-                            }
-                            else{
-                                alert("不是质数");
-                            }
-                        }
-                    </script>
+                    
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <div class="footer">
             -xzy的网站-
