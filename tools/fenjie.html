@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>分解质因数-xzy的网站</title>
+        <link rel="shortcut icon" href="xuziyue2009.github.io/favicon.ico"></link>
+        <link rel="stylesheet" type="text/css" href="/style.css">
+    </head>
+    <body>
+        <div class="header">
+            <h1>分解质因数</h1>
+            <p>把合数写成几个质数相乘的形式</p>
+            <hr>
+            <h2>输入一个合数</h2>
+            <input type="number" min="1" max="2147483647" name="inputx" id="inputx">
+            <input type="button" id="button" value="分解">
+            <div id="result"></div>
+
+            <script type="text/javascript">
+                var x = document.getElementById("inputx");
+                btn = document.getElementById("button")
+                btn.onclick = function(){
+			        var i = 2;
+                    result = [];
+                    for (var i = 2; i * i <= num; i++){
+                        while (num % i === 0) {
+                            result.push(i);
+                            num = num / i;
+                        }
+                    }
+                    if (num > 1) {
+                        result.push(num)
+                    }
+                    document.getElementById("result").innerHTML = result;
+                }
+            </script>
+        </div>
+
+        <!-- <div class="row">
+            <div class="fullcolumn">
+                <div class="card">
+                    
+                </div>
+            </div>
+        </div> -->
+
+        <div class="footer">
+            -xzy的网站-
+        </div> 
+    </body>
+</html>
