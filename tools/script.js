@@ -1,16 +1,20 @@
-function factorize(num) {
-    var factors = [];
-    
-    for (var i = 2; i <= Math.sqrt(num); i++) {
-        while (num % i === 0) {
-            factors.push(i);
-            num /= i;
-        }
+function test(n){
+    var flag=0;
+    for(var i=2;i<=n;i++){
+    if(n%i==0){
+    flag++;
+    if(flag==1){
+    alert(n+"="+i);
+    }else{
+    alert("×"+i);
     }
-    
-    if (num > 1) {
-        factors.push(num);
+    n=n/i;
+    i--;
     }
-    
-    return factors;
-}
+    }
+    if(flag==0){
+    alert(n+"为质数");
+    }else{
+    alert("共有"+flag+"个质因数");
+    }
+    }
