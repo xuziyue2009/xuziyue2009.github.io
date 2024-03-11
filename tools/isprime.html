@@ -18,21 +18,11 @@
                 var x = document.getElementById("inputx");
                 btn = document.getElementById("button")
                 btn.onclick = function(){
-			        var flag = true;
 			        var num = x.value - 0;
-                    if (num % 2 == 0 && num != 2){
-                        flag = false;
-                    }
-		            for (var i = 3; i*i <= num ; i+=2){
-                        if (num % i == 0){
-                            flag = false;
-                            break;
-                        }
-                    }
                     if(num == 2236){
                         alert("芝士ichang");
                     }
-                    else if (flag){
+                    else if (isprime(num)){
                         alert("芝士质数");
                     }
                     else{

@@ -1,20 +1,11 @@
-function test(n){
-    var flag=0;
-    for(var i=2;i<=n;i++){
-    if(n%i==0){
-    flag++;
-    if(flag==1){
-    alert(n+"="+i);
-    }else{
-    alert("×"+i);
+function isprime(num){
+    if (num % 2 == 0 && num != 2){
+        return false;
     }
-    n=n/i;
-    i--;
+    for (var i = 3; i*i <= num ; i+=2){
+        if (num % i == 0){
+            return false;
+        }
     }
-    }
-    if(flag==0){
-    alert(n+"为质数");
-    }else{
-    alert("共有"+flag+"个质因数");
-    }
-    }
+    return true;
+}
