@@ -21,10 +21,19 @@
                 var x = document.getElementById("inputx");
                 btn = document.getElementById("button")
                 btn.onclick = function(){
-			        var result = factorize(x);
-                    console.log(factorize(x));
-                    document.getElementById("result").innerHTML = result;
-                    alert(result);
+                    var num = x.value - 0;
+			        var result = factorize(num);
+                    var output = result[0];
+                    // console.log(result.length);
+                    // console.log(result);
+                    // console.log(result[0]);
+                    // console.log(result[1]);
+                    // console.log(result[2]);
+                    for (var i = 1; i < result.length; i++){
+                        output = output + " × " + result[i];
+                    }
+                    output = "结果：" + num + " = " + output;
+                    document.getElementById("result").innerHTML = output;
                 }
             </script>
         </div>
