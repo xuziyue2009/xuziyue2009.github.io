@@ -18,7 +18,7 @@ function create() {
 
     console.log(randomNum);
   
-    for (var i = 1; i <= 5 * l; i++) {  
+    for (var i = 1; i <= l; i++) {  
         var output = word;  
         if (i === randomNum) {  
             output = output.substring(0, randomPlace) + letters[randomLetter] + output.substring(randomPlace + 1);  
