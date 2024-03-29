@@ -1,4 +1,4 @@
-var l = 1;  
+var l = 5;  
 var randomNum;
 var points = 0;
 const word = "Supercalifragilisticexpialidocious";  
@@ -12,7 +12,7 @@ function create() {
     var variantsDiv = document.getElementById('variants'); // 获取容纳变体的 div 元素  
     variantsDiv.innerHTML = ''; // 清空 div 的内容，以便添加新的变体  
   
-    randomNum = Math.floor(Math.random() * l * 5) + 1;  
+    randomNum = Math.floor(Math.random() * l) + 1;  
     var randomPlace = Math.floor(Math.random() * word.length); // 注意这里使用 word.length 而不是硬编码的 34  
     var randomLetter = Math.floor(Math.random() * 26);  
 
