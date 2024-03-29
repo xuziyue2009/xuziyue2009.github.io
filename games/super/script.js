@@ -74,22 +74,13 @@ function checkNumber() {
     if (isAns) {  
         alert("对");  
         points += 1;  
-        var pointsdiv = document.getElementById('points');  
-        // 清空 points div 的内容  
-        pointsdiv.innerHTML = '';  
-          
-        // 创建一个新的<p>元素来显示分数  
-        var pointsoutput = document.createElement('p');  
-        pointsoutput.textContent = "分数：" + points;  
-          
-        // 将<p>元素添加到'points' div中  
-        pointsdiv.appendChild(pointsoutput);  
     }
     else{
         alert("错");
         points -= 1;
         l -= 1;
     }
+    pointsfresh();
 
     var variantsDiv = document.getElementById('variants'); // 获取容纳变体的 div 元素  
     variantsDiv.innerHTML = ''; // 清空 div 的内容，以便添加新的变体  
@@ -99,4 +90,17 @@ function checkNumber() {
     variantsDiv.innerHTML = ''; // 清空 div 的内容，以便添加新的变体  
 
     create()
+}
+
+function pointsfresh(){
+    var pointsdiv = document.getElementById('points');  
+    // 清空 points div 的内容  
+    pointsdiv.innerHTML = '';  
+      
+    // 创建一个新的<p>元素来显示分数  
+    var pointsoutput = document.createElement('p');  
+    pointsoutput.textContent = "分数：" + points;  
+      
+    // 将<p>元素添加到'points' div中  
+    pointsdiv.appendChild(pointsoutput);
 }
