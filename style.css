@@ -1,5 +1,5 @@
 p{
-    font-family: "宋体", "Comic Sans MS", cursive, sans-serif;
+    font-family: "宋体", "Consolas", monospace; /* 中文优先使用宋体，如果没有则使用Consolas或任何可用的等宽字体 */
 }
 
 * {
