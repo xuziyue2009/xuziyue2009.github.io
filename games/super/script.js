@@ -23,11 +23,17 @@ function create() {
         if (i === randomNum) {  
             output = output.substring(0, randomPlace) + letters[randomLetter] + output.substring(randomPlace + 1);  
         }  
+
+        p_i = i;
+        if (p_i < 10){
+            p_i = "0" + p_i.toString();
+        }
+        p_i = p_i.toString() + ".";
   
         // 创建新的 p 元素  
         var pElement = document.createElement('p');  
         // 设置 p 元素的内容  
-        pElement.textContent = output;  
+        pElement.textContent = p_i + output;  
         // 将 p 元素添加到 div 中  
         variantsDiv.appendChild(pElement);  
     }  
