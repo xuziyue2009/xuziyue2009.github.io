@@ -44,6 +44,7 @@ function create() {
     input.type = 'number'; // 设置类型为number  
     input.id = 'numberInput'; // 设置id为numberInput  
     input.placeholder = '请输入一个数字'; // 设置占位符
+    input.onkeydown = enterPressed; // 设置回车检查
 
     var inputDiv = document.getElementById('inputans');
     inputDiv.appendChild(input);
@@ -110,3 +111,9 @@ function pointsfresh(){
     // 将<p>元素添加到'points' div中  
     pointsdiv.appendChild(pointsoutput);
 }
+
+function enterPressed(event) {  
+    if (event.key === "Enter") {  
+        checkNumber();  
+    }  
+}  
