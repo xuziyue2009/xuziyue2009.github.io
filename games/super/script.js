@@ -1,6 +1,8 @@
 var l = 5;  
 var randomNum;
 var points = 0;
+var output;
+var tip_output;
 const word = "Supercalifragilisticexpialidocious";  
 const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']; 
 
@@ -19,9 +21,10 @@ function create() {
     console.log(randomNum);
   
     for (var i = 1; i <= l; i++) {  
-        var output = word;  
+        output = word;  
         if (i === randomNum) {  
             output = output.substring(0, randomPlace) + letters[randomLetter] + output.substring(randomPlace + 1);  
+            tip_output = output.substring(0, randomPlace) + "<" + letters[randomLetter] + ">" + output.substring(randomPlace + 1);
         }  
 
         p_i = i;
@@ -79,11 +82,11 @@ function checkNumber() {
     var isAns = number === randomNum;  
 
     if (isAns) {  
-        alert("对");  
+        alert("对\n" + tip_output);  
         points += 1;  
     }
     else{
-        alert("错");
+        alert("错\n" + tip_output);
         points -= 1;
         l -= 1;
     }
