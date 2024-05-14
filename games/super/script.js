@@ -11,8 +11,8 @@ window.onload = function load(){
 }
   
 function create() {  
-    var variantsDiv = document.getElementById('variants'); // 获取容纳变体的 div 元素  
-    variantsDiv.innerHTML = ''; // 清空 div 的内容，以便添加新的变体  
+    var variantsDiv = document.getElementById('variants'); // 获取容纳变体的 div 元素
+    variantsDiv.innerHTML = ''; // 清空 div 的内容，以便添加新的变体
   
     randomNum = Math.floor(Math.random() * l) + 1;  
     var randomPlace = Math.floor(Math.random() * word.length); // 注意这里使用 word.length 而不是硬编码的 34  
@@ -34,28 +34,28 @@ function create() {
         p_i = p_i.toString() + ".";
   
         // 创建新的 p 元素  
-        var pElement = document.createElement('p');  
-        // 设置 p 元素的内容  
-        pElement.textContent = p_i + output;  
-        // 将 p 元素添加到 div 中  
-        variantsDiv.appendChild(pElement);  
+        var pElement = document.createElement('p');
+        // 设置 p 元素的内容
+        pElement.textContent = p_i + output;
+        // 将 p 元素添加到 div 中
+        variantsDiv.appendChild(pElement);
     }  
   
     l += 1;  
 
-    var input = document.createElement('input'); // 创建一个新的<input>元素  
-    input.type = 'number'; // 设置类型为number  
-    input.id = 'numberInput'; // 设置id为numberInput  
+    var input = document.createElement('input'); // 创建一个新的<input>元素
+    input.type = 'number'; // 设置类型为number
+    input.id = 'numberInput'; // 设置id为numberInput
     input.placeholder = '请输入一个数字'; // 设置占位符
     input.onkeydown = enterPressed; // 设置回车检查
 
     var inputDiv = document.getElementById('inputans');
     inputDiv.appendChild(input);
 
-    // 添加按钮  
-    var checkButton = document.createElement('button');  
-    checkButton.textContent = '检查答案'; // 设置按钮文本  
-    checkButton.onclick = checkNumber; // 设置按钮点击事件处理程序  
+    // 添加按钮
+    var checkButton = document.createElement('button');
+    checkButton.textContent = '检查答案'; // 设置按钮文本
+    checkButton.onclick = checkNumber; // 设置按钮点击事件处理程序
   
     // 获取包含按钮的 div 元素  
     var buttonDiv = document.getElementById('buttonDiv');  
