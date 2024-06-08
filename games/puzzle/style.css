@@ -1,0 +1,18 @@
+#puzzle {  
+    display: grid;  
+    grid-template-columns: repeat(3, 1fr);  
+    gap: 2px;  
+    width: 150px; /* 假设每个格子大小为50px，加上间隙，总宽度为156px */  
+    height: 150px; /* 同上 */  
+}  
+  
+.tile {  
+    width: 50px;  
+    height: 50px;  
+    line-height: 50px;  
+    text-align: center;  
+    border: 1px solid #000;  
+    font-size: 1.2em;  
+    user-select: none;  
+    cursor: pointer;  
+}  
