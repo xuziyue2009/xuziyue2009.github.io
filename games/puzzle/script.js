@@ -16,6 +16,7 @@ function swap(a, b){
     var tmp = numbers[a];
     numbers[a] = numbers[b];
     numbers[b] = tmp;
+    console.log(a,"to",b);
 }
 
 function refresh(){
@@ -27,9 +28,27 @@ function refresh(){
         const tile = document.createElement('div');    
         tile.classList.add('tile');    
         tile.textContent = num.toString(); // 将数字转换为字符串并显示  
+        if (num == 0){
+            tile.textContent = "";
+        }
         tile.addEventListener('click', onTileClick);    
         puzzleContainer.appendChild(tile);    
     });    
+    check();
+}
+
+function check(){
+    for (var i = 0; i < 8; i+=1){
+        if (numbers[i] != i+1){
+            return 1;
+        }
+    }
+    success();
+    return 0;
+}
+
+function success(){
+    alert("success");
 }
   
 function onTileClick(event) {  
@@ -125,7 +144,7 @@ function onTileClick(event) {
             break;
         case 8:
             if (numbers[5] == 0){
-                swap(8,3);
+                swap(8,5);
             }
             else if (numbers[7] == 0){
                 swap(8,7);
