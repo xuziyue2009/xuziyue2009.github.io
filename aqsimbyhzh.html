@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>离子反应模拟器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2a4d69, #4b86b4);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            background: rgba(0, 30, 60, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: #e0f7fa;
+        }
+        
+        .content {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .panel {
+            background: rgba(25, 55, 109, 0.85);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .input-section {
+            background: rgba(40, 70, 130, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        button {
+            flex: 1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        #add-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+        }
+        
+        #clear-btn {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .sediment-section {
+            background: rgba(40, 70, 130, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4db8ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #4db8ff;
+        }
+        
+        .sediment-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .sediment-item {
+            background: rgba(70, 130, 180, 0.6);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .sediment-item:hover {
+            transform: translateY(-5px);
+            background: rgba(70, 130, 180, 0.8);
+        }
+        
+        .sediment-formula {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .sediment-amount {
+            font-size: 1.1rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+        
+        .center-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .reaction-display {
+            background: rgba(40, 极70, 130, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .beaker-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .beaker {
+            width: 250px;
+            height: 300px;
+            position: relative;
+            border: 8px solid rgba(255, 255, 255, 0.7);
+            border-bottom: 15px solid rgba(255, 255, 255, 0.7);
+            border-radius: 0 0 40px 40px;
+            background: linear-gradient(to bottom, rgba(173, 216, 230, 0.4), rgba(135, 206, 250, 0.1));
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .solution {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 70%;
+            background: linear-gradient(to top, rgba(100, 200, 255, 0.5), rgba(64, 164, 223, 0.7));
+            border-radius: 0 0 32px 32px;
+            transition: height 1s ease;
+        }
+        
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            bottom: 0;
+        }
+        
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            bottom: 0;
+            animation: rise linear infinite;
+        }
+        
+        .precipitate {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            bottom: 0;
+            animation: precipitate linear forwards;
+        }
+        
+        @keyframes rise {
+            to {
+                bottom: 100%;
+                opacity: 0;
+                transform: translateX(10px);
+            }
+        }
+        
+        @keyframes precipitate {
+            to {
+                bottom: 20px;
+            }
+        }
+        
+        .equation-display {
+            background: rgba(40, 70, 130, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 150px;
+        }
+        
+        .equation {
+            font-size: 2.2rem;
+            text-align: center;
+            font-family: 'Times New Roman', serif;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .equation-info {
+            font-size: 1.1rem;
+            text-align: center;
+            line-height: 1.6;
+            color: #e0f7fa;
+        }
+        
+        .right-panel {
+            flex: 1.5;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .ion-display {
+            background: rgba(40, 70, 130, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+        }
+        
+        .ion-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 100%;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .ion-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: rgba(70, 130, 180, 0.4);
+            border-radius: 8px;
+            transition: transform 0.2s ease;
+        }
+        
+        .ion-item:hover {
+            transform: translateX(5px);
+            background: rgba(70, 130, 180, 0.6);
+        }
+        
+        .ion-symbol {
+            font-size: 1.4rem;
+            font-weight: bold;
+            min-width: 70px;
+        }
+        
+        .ion-name {
+            flex: 1;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+        
+        .ion-amount {
+            font-size: 1.1rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px 15px;
+            border-radius: 20px;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .ion-cation {
+            border-left: 4px solid #ff9a9e;
+        }
+        
+        .ion-anion {
+            border-left: 4px solid #a1c4fd;
+        }
+        
+        .info-panel {
+            background: rgba(40, 70, 130, 0.6);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+        
+        .info-content {
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .info-content h3 {
+            margin: 20px 0 10px;
+            color: #4db8ff;
+        }
+        
+        .info-content ul {
+            padding-left: 25px;
+            margin: 10px 0;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #a0c8e0;
+            font-style: italic;
+        }
+        
+        .reaction-log {
+            background: rgba(40, 70, 130, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .log-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        @media (max-width: 1100px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .beaker {
+                width: 200px;
+                height: 250px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .panel {
+                padding: 15px;
+            }
+            
+            .equation {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-flask"></i> 离子反应模拟器</h1>
+            <p class="subtitle">本模拟器展示溶液中离子间的化学反应，包括沉淀生成、酸碱中和、气体产生等现象。添加溶质观察离子相互作用和反应结果。</p>
+        </header>
+        
+        <div class="content">
+            <!-- 左侧面板：输入和沉淀 -->
+            <div class="left-panel">
+                <div class="panel input-section">
+                    <h2 class="section-title"><i class="fas fa-pencil-alt"></极> 添加溶质</h2>
+                    <div class="input-group">
+                        <label for="substance">溶质化学式（限填一种）</label>
+                        <input type="text" id="substance" placeholder="例如: NaCl, AgNO3, H2SO4">
+                    </div>
+                    <div class="input-group">
+                        <label for="amount">物质的量（不填单位）</label>
+                        <input type="number" id="amount" placeholder="输入物质的量" min="0" step="0.1">
+                    </div>
+                    <div class="button-group">
+                        <button id="add-btn"><i class="fas fa-plus-circle"></i> 添加到溶液</button>
+                        <button id="clear-btn"><i class="fas fa-trash-alt"></i> 清空溶液</button>
+                    </div>
+                </div>
+                
+                <div class="panel sediment-section">
+                    <h2 class="section-title"><i class="fas fa-vial"></i> 沉淀生成</h2>
+                    <div class="sediment-container" id="sediment-container">
+                        <div class="empty-state">暂无沉淀生成</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 中央面板：反应显示 -->
+            <div class="center-panel">
+                <div class="panel reaction-display">
+                    <h2 class="section-title"><i class="fas fa-atom"></i> 反应过程</h2>
+                    <div class="beaker-container">
+                        <div class="beaker">
+                            <div class="solution">
+                                <div class="bubbles" id="bubbles"></div>
+                                <div id="precipitate"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="equation-display">
+                        <div class="equation" id="equation">等待反应发生...</div>
+                        <p class="equation-info" id="equation-info">添加溶质到溶液中开始模拟离子反应</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧面板：离子显示 -->
+            <div class="right-panel">
+                <div class="panel ion-display">
+                    <h2 class="section-title"><i class="fas fa-vial"></i> 离子分布</h2>
+                    <div class="ion-list" id="ion-list">
+                        <div class="empty-state">溶液中暂无离子</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 反应日志 -->
+        <div class="panel reaction-log">
+            <h2 class="log-title"><i class="fas fa-clipboard-list"></i> 反应日志</h2>
+            <div id="reaction-log-content">
+                <div class="log-entry">系统已初始化，等待添加溶质...</div>
+            </div>
+        </div>
+        
+        <!-- 信息面板 -->
+        <div class="panel info-panel">
+            <h2 class="section-title"><i class="fas fa-info-circle"></i> 离子反应原理</h2>
+            <div class="info-content">
+                <p>离子反应是指在水溶液中有离子参加的化学反应。离子反应的本质是反应物的某些离子浓度的减小。</p>
+                
+                <h3>离子反应发生的条件：</h3>
+                <ul>
+                    <li><strong>生成沉淀：</strong>如 Ag⁺ + Cl⁻ → AgCl↓</li>
+                    <li><strong>生成气体：</strong>如 2H⁺ + CO3²⁻ → CO₂↑ + H₂O</li>
+                    <li><strong>生成弱电解质：</strong>如 H⁺ + OH⁻ → H₂O</li>
+                </ul>
+                
+                <h3>本模拟器包含的离子：</h3>
+                <p>阳离子：H⁺, NH4⁺, K⁺, Na⁺, Ba²⁺, Ca²⁺, Mg²⁺, Al³⁺, Mn²⁺, Zn²⁺, Fe²⁺, Fe³⁺, Cu²⁺, Ag⁺</p>
+                <p>阴离子：OH⁻, NO3⁻, Cl⁻, SO4²⁻, CO3²⁻</p>
+                
+                <h3>支持的化合物：</h3>
+                <p>酸：HCl, H2SO4, HNO3, H2CO3</p>
+                <p>碱：NaOH, KOH, NH4OH, Ca(OH)2, Ba(OH)2, Mg(OH)2, Al(OH)3, Mn(OH)2, Zn(OH)2, Fe(OH)2, Fe(OH)3, Cu(OH)2</p>
+                <p>盐：NaCl, AgNO3, BaCl2, CaCl2, Na2CO3, Na2SO4, NaNO3, NH4NO3等</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 预存储的数据结构（使用普通数字格式）
+        const mt = [
+            "H⁺", "NH4⁺", "K⁺", "Na⁺", "Ba²⁺", "Ca²⁺", "Mg²⁺", "Al³⁺", 
+            "Mn²⁺", "Zn²⁺", "Fe²⁺", "Fe³⁺", "Cu²⁺", "Ag⁺", 
+            "OH⁻", "NO3⁻", "Cl⁻", "SO4²⁻", "CO3²⁻"
+        ];
+        
+        // 物质信息（添加了大量新物质）
+        const mall = {
+            // 酸
+            "HCl": { solubility: 1, ions: [0, 16], counts: [1, 1] },
+            "H2SO4": { solubility: 1, ions: [0, 17], counts: [2, 1] },
+            "HNO3": { solubility: 1, ions: [0, 15], counts: [1, 1] },
+            "H2CO3": { solubility: 1, ions: [0, 18], counts: [2, 1] },
+            
+            // 碱（添加了多种难溶碱）
+            "NaOH": { solubility: 1, ions: [3, 14], counts: [1, 1] },
+            "KOH": { solubility: 1, ions: [2, 14], counts: [1, 1] },
+            "NH4OH": { solubility: 1, ions: [1, 14], counts: [1, 1] },
+            "Ca(OH)2": { solubility: 1, ions: [5, 14], counts: [1, 2] },
+            "Ba(OH)2": { solubility: 1, ions: [4, 14], counts: [1, 2] },
+            "Mg(OH)2": { solubility: 0, ions: [6, 14], counts: [1, 2] },
+            "Al(OH)3": { solubility: 0, ions: [7, 14], counts: [1, 3] },
+            "Mn(OH)2": { solubility: 0, ions: [8, 14], counts: [1, 2] },
+            "Zn(OH)2": { solubility: 0, ions: [9, 14], counts: [1, 2] },
+            "Fe(OH)2": { solubility: 0, ions: [10, 14], counts: [1, 2] },
+            "Fe(OH)3": { solubility: 0, ions: [11, 14], counts: [1, 3] },
+            "Cu(OH)2": { solubility: 0, ions: [12, 14], counts: [1, 2] },
+            
+            // 盐（添加了大量新盐）
+            "NaCl": { solubility: 1, ions: [3, 16], counts: [1, 1] },
+            "AgNO3": { solubility: 1, ions: [13, 15], counts: [1, 1] },
+            "BaCl2": { solubility: 1, ions: [4, 16], counts: [1, 2] },
+            "CaCl2": { solubility: 1, ions: [5, 16], counts: [1, 2] },
+            "Na2CO3": { solubility: 1, ions: [3, 18], counts: [2, 1] },
+            "Na2SO4": { solubility: 1, ions: [3, 17], counts: [2, 1] },
+            "AgCl": { solubility: 0, ions: [13, 16], counts: [1, 1] },
+            "BaSO4": { solubility: 0, ions: [4, 17], counts: [1, 1] },
+            "CaCO3": { solubility: 0, ions: [5, 18], counts: [1, 1] },
+            "MgCO3": { solubility: 0, ions: [6, 18], counts: [1, 1] },
+            "Al2(CO3)3": { solubility: 0, ions: [7, 18], counts: [2, 3] },
+            "CuCO3": { solubility: 0, ions: [12, 18], counts: [1, 1] },
+            "FeCO3": { solubility: 0, ions: [10, 18], counts: [1, 1] },
+            "NaNO3": { solubility: 1, ions: [3, 15], counts: [1, 1] },
+            "NH4NO3": { solubility: 1, ions: [1, 15], counts: [1, 1] },
+            "Ba(NO3)2": { solubility: 1, ions: [4, 15], counts: [1, 2] },
+            "Ca(NO3)2": { solubility极: 1, ions: [5, 15], counts: [1, 2] },
+            "Mg(NO3)2": { solubility: 1, ions: [6, 15], counts: [1, 2] },
+            "Al(NO3)3": { solubility: 1, ions: [7, 15], counts: [1, 3] },
+            "Mn(NO3)2": { solubility: 1, ions: [8, 15], counts: [1, 2] },
+            "Zn(NO3)2": { solubility: 1, ions: [9, 15], counts: [1, 2] },
+            "Fe(NO3)2": { solubility: 1, ions: [10, 15], counts: [1, 2] },
+            "Fe(NO3)3": { solubility: 1, ions: [11, 15], counts: [1, 3] },
+            "Cu(NO3)2": { solubility: 1, ions: [12, 15], counts: [1, 2] },
+            "NH4Cl": { solubility: 1, ions: [1, 16], counts: [1, 1] },
+            "KCl": { solubility: 1, ions: [2, 16], counts: [1, 1] },
+            "MgCl2": { solubility: 1, ions: [6, 16], counts: [1, 2] },
+            "AlCl3": { solubility: 1, ions: [7, 16], counts: [1, 3] },
+            "MnCl2": { solubility: 1, ions: [8, 16], counts: [1, 2] },
+            "ZnCl2": { solubility: 1, ions: [9, 16], counts: [1, 2] },
+            "FeCl2": { solubility: 1, ions: [10, 16], counts: [1, 2] },
+            "FeCl3": { solubility: 1, ions: [11, 16], counts: [1, 3] },
+            "CuCl2": { solubility: 1, ions: [12, 16], counts: [1, 2] },
+            "(NH4)2SO4": { solubility: 1, ions: [1, 17], counts: [2, 1] },
+            "K2SO4": { solubility: 1, ions: [2, 17], counts: [2, 1] },
+            "CaSO4": { solubility: 0, ions: [5, 17], counts: [1, 1] },
+            "MgSO4": { solubility: 1, ions: [6, 17], counts: [1, 1] },
+            "Al2(SO4)3": { solubility: 1, ions: [7, 17], counts: [2, 3] },
+            "MnSO4": { solubility: 1, ions: [8, 17], counts: [1, 1] },
+            "ZnSO4": { solubility: 1, ions: [9, 17], counts: [1, 1] },
+            "FeSO4": { solubility: 1, ions: [10, 17], counts: [1, 1] },
+            "Fe2(SO4)3": { solubility: 1, ions: [11, 17], counts: [2, 3] },
+            "CuSO4": { solubility: 1, ions: [12, 17], counts: [1, 1] },
+            "(NH4)2CO3": { solubility: 1, ions: [1, 18], counts: [2, 1] },
+            "K2CO3": { solubility: 1, ions: [2, 18], counts: [2, 1] },
+            "MnCO3": { solubility: 0, ions: [8, 18], counts: [1, 1] },
+            "ZnCO3": { solubility: 0, ions: [9, 18], counts: [1, 1] },
+            "Ag2CO3": { solubility: 0, ions: [13, 18], counts: [2, 1] }
+        };
+        
+        // 溶解性表（修正所有错误）
+        const mp = [
+            // H⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1],
+            // NH4⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1],
+            // K⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1],
+            // Na⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1],
+            // Ba²⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 0, 0],
+            // Ca²⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 0, 0],
+            // Mg²⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 1, 1, 0],
+            // Al³⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 1, 1, 1],
+            // Mn²⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 1, 1, 0],
+            // Zn²⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 1, 1, 0],
+            // Fe²⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 1, 1, 0],
+            // Fe³⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 1, 1, 1],
+            // Cu²⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 1, 1, 0],
+            // Ag⁺
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 0, 0, 0],
+            // OH⁻
+            [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1],
+            // NO3⁻
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1],
+            // Cl⁻
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, -1, -1, -1, -1, -1],
+            // SO4²⁻
+            [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, -1, -1, -1, -1, -1],
+            // CO3²⁻
+            [1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1, -1, -1, -1, -1]
+        ];
+        
+        // 盐的化学式（修正所有错误）
+        const mn = [
+            // H⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "H2O", "HNO3", "HCl", "H2SO4", "H2CO3"],
+            // NH4⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "NH4OH", "NH4NO3", "NH4Cl", "(NH4)2SO4", "(NH4)2CO3"],
+            // K⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "KOH", "KNO3", "KCl", "K2SO4", "K2CO3"],
+            // Na⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "NaOH", "NaNO3", "NaCl", "Na2SO4", "Na2CO3"],
+            // Ba²⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "Ba(OH)2", "Ba(NO3)2", "BaCl2", "BaSO4", "BaCO3"],
+            // Ca²⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "Ca(OH)2", "Ca(NO3)2", "CaCl2", "CaSO4", "CaCO3"],
+            // Mg²⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "Mg(OH)2", "Mg(NO3)2", "MgCl2", "MgSO4", "MgCO3"],
+            // Al³⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "Al(OH)3", "Al(NO3)3", "AlCl3", "Al2(SO4)3", "Al2(CO3)3"],
+            // Mn²⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "Mn(OH)2", "Mn(NO3)2", "MnCl2", "MnSO4", "MnCO3"],
+            // Zn²⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "Zn(OH)2", "Zn(NO3)2", "ZnCl2", "ZnSO4", "ZnCO3"],
+            // Fe²⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "Fe(OH)2", "Fe(NO3)2", "FeCl2", "FeSO4", "FeCO3"],
+            // Fe³⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "Fe(OH)3", "Fe(NO3)3", "FeCl3", "Fe2(SO4)3", "Fe2(CO3)3"],
+            // Cu²⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "Cu(OH)2", "Cu(NO3)2", "CuCl2", "CuSO4", "CuCO3"],
+            // Ag⁺
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "Ag2O", "AgNO3", "AgCl", "Ag2SO4", "Ag2CO3"],
+            // OH⁻
+            ["H2O", "NH4OH", "KOH", "NaOH", "Ba(OH)2", "Ca(OH)2", "Mg(OH)2", "Al(OH)3", "Mn(OH)2", "Zn(OH)2", "Fe(OH)2", "Fe(OH)3", "Cu(OH)2", "Ag2O", null, null, null, null, null],
+            // NO3⁻
+            ["HNO3", "NH4NO3", "KNO3", "NaNO3", "Ba(NO3)2", "Ca(NO3)2", "Mg(NO3)2", "Al(NO3)3", "Mn(NO3)2", "Zn(NO3)2", "Fe(NO3)2", "Fe(NO3)3", "Cu(NO3)2", "AgNO3", null, null, null, null, null],
+            // Cl⁻
+            ["HCl", "NH4Cl", "KCl", "NaCl", "BaCl2", "CaCl2", "MgCl2", "AlCl3", "MnCl2", "ZnCl2", "FeCl2", "FeCl3", "CuCl2", "AgCl", null, null, null, null, null],
+            // SO4²⁻
+            ["H2SO4", "(NH4)2SO4", "K2极SO4", "Na2SO4", "BaSO4", "CaSO4", "MgSO4", "Al2(SO4)3", "MnSO4", "ZnSO4", "FeSO4", "Fe2(SO4)3", "CuSO4", "Ag2SO4", null, null, null, null, null],
+            // CO3²⁻
+            ["H2CO3", "(NH4)2CO3", "K2CO3", "Na2CO3", "BaCO3", "CaCO3", "MgCO3", "Al2(CO3)3", "MnCO3", "ZnCO3", "FeCO3", "Fe2(CO3)3", "CuCO3", "Ag2CO3", null, null, null, null, null]
+        ];
+        
+        // 包含碳酸根的盐
+        const co3 = ["H2CO3", "(NH4)2CO3", "K2CO3", "Na2CO3", "BaCO3", "CaCO3", "MgCO3", "Al2(CO3)3", "MnCO3", "ZnCO3", "FeCO3", "Fe2(CO3)3", "CuCO3", "Ag2CO3"];
+        
+        // 碱沉淀列表
+        const baseSediments = ["Mg(OH)2", "Al(OH)3", "Mn(OH)2", "Zn(OH)2", "Fe(OH)2", "Fe(OH)3", "Cu(OH)2"];
+        
+        // co3ion数组 - 存储碳酸盐对应的阳离子下标
+        const co3ion = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+        
+        // 离子名称（用于显示）
+        const ionNames = [
+            "氢离子", "铵根离子", "钾离子", "钠离子", "钡离子", "钙离子", "镁离子", "铝离子",
+            "二价锰离子", "锌离子", "亚铁离子", "铁离子", "铜离子", "银离子",
+            "氢氧根离子", "硝酸根离子", "氯离子", "硫酸根离子", "碳酸根离子"
+        ];
+        
+        // 实时记录的数据
+        let ionTable = Array(mt.length).fill(0); // 离子表
+        let sedimentTable = []; // 沉淀表
+        let displayTable = Array(mt.length).fill(0); // 显示表
+        
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加按钮事件
+            document.getElementById('add-btn').addEventListener('click', addSubstance);
+            document.getElementById('clear-btn').addEventListener('click', clearSolution);
+            
+            // 初始状态更新显示
+            updateDisplay();
+        });
+        
+        // 添加溶质功能
+        function addSubstance() {
+            const substance = document.getElementById('substance').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            
+            if (!substance || isNaN(amount) || amount <= 0) {
+                alert('请输入有效的溶质和物质的量');
+                return;
+            }
+            
+            // 检查物质是否在mall中
+            if (!mall[substance]) {
+                alert('未知的溶质或该溶质不参与反应');
+                return;
+            }
+            
+            // 添加到溶液
+            const substanceInfo = mall[substance];
+            
+            if (substanceInfo.solubility === 0) {
+                // 难溶物质直接加入沉淀表
+                addToSedimentTable(substance, amount);
+                addLog(`添加 ${amount} mol ${substance}（难溶沉淀）`);
+            } else {
+                // 可溶物质电离成离子
+                for (let i = 0; i < substanceInfo.ions.length; i++) {
+                    const ionIndex = substanceInfo.ions[i];
+                    const ionCount = substanceInfo.counts[i];
+                    ionTable[ionIndex] += amount * ionCount;
+                }
+                addLog(`添加 ${amount} mol ${substance}，电离产生离子`);
+            }
+            
+            // 执行离子处理
+            processIonReactions();
+            
+            // 更新显示
+            updateDisplay();
+            
+            // 清空输入
+            document.getElementById('substance').value = '';
+            document.getElementById('amount').value = '';
+        }
+        
+        // 清空溶液功能
+        function clearSolution() {
+            // 重置离子表
+            ionTable = Array(mt.length).fill(0);
+            
+            // 清空沉淀表
+            sedimentTable = [];
+            
+            // 重置方程显示
+            setEquation("等待反应发生...", "添加溶质到溶液中开始模拟离子反应");
+            
+            // 添加日志
+            addLog("已清空溶液，所有离子和沉淀已移除");
+            
+            // 更新显示
+            updateDisplay();
+        }
+        
+        // 添加到沉淀表
+        function addToSedimentTable(type, num) {
+            // 检查是否已有该沉淀
+            const existingSediment = sedimentTable.find(s => s.type === type);
+            if (existingSediment) {
+                existingSediment.num += num;
+            } else {
+                sedimentTable.push({ type, num });
+            }
+        }
+        
+        // 处理离子反应
+        function processIonReactions() {
+            // 处理酸碱中和
+            processAcidBase();
+            
+            // 处理沉淀反应
+            processPrecipitation();
+            
+            // 处理碳酸盐反应
+            processCarbonate();
+            
+            // 处理碱沉淀与H+的反应
+            processBaseSediment();
+        }
+        
+        // 处理酸碱中和
+        function processAcidBase() {
+            const hIndex = mt.indexOf("H⁺");
+            const ohIndex = mt.indexOf("OH⁻");
+            
+            if (ionTable[hIndex] > 0 && ionTable[ohIndex] > 0) {
+                const minAmount = Math.min(ionTable[hIndex], ionTable[ohIndex]);
+                ionTable[hIndex] -= minAmount;
+                ionTable[ohIndex] -= minAmount;
+                
+                // 更新反应方程
+                setEquation("H⁺ + OH⁻ → H₂O", "酸碱中和反应生成水");
+                addLog(`发生中和反应: H⁺ + OH⁻ → H₂O (${minAmount.toFixed(4)} mol)`);
+            }
+        }
+        
+        // 处理沉淀反应
+        function processPrecipitation() {
+            for (let i = 0; i < mt.length; i++) {
+                for (let j = 0; j < mt.length; j++) {
+                    if (mp[i][j] === 0 && ionTable[i] > 0 && ionTable[j] > 0) {
+                        const minAmount = Math.min(ionTable[i], ionTable[j]);
+                        const compound = mn[i][j];
+                        
+                        // 添加到沉淀表
+                        addToSedimentTable(compound, minAmount);
+                        
+                        // 更新离子表
+                        ionTable[i] -= minAmount;
+                        ionTable[j] -= minAmount;
+                        
+                        // 更新反应方程
+                        setEquation(`${mt[i]} + ${mt[j]} → ${compound}`, "沉淀反应生成不溶物");
+                        addLog(`生成沉淀: ${mt[i]} + ${mt[j]} → ${compound} (${minAmount.toFixed(4)} mol)`);
+                    }
+                }
+            }
+        }
+        
+        // 处理碳酸盐反应
+        function processCarbonate() {
+            const hIndex = mt.indexOf("H⁺");
+            const co3Index = mt.indexOf("CO3²⁻");
+            
+            // 处理溶液中的碳酸根离子
+            if (ionTable[hIndex] > 0 && ionTable[co3Index] > 0) {
+                // 氢离子与碳酸根反应
+                const minAmount = Math.min(ionTable[hIndex] / 2, ionTable[co3Index]);
+                
+                ionTable[hIndex] -= minAmount * 2;
+                ionTable[co3Index] -= minAmount;
+                
+                // 更新反应方程
+                setEquation("2H⁺ + CO3²⁻ → H₂O + CO₂", "碳酸根与氢离子反应生成二氧化碳");
+                addLog(`发生碳酸反应: 2H⁺ + CO3²⁻ → H₂O + CO₂ (${minAmount.toFixed(4)} mol)`);
+                
+                // 创建气泡动画
+                createBubbles();
+            }
+            
+            // 处理沉淀的碳酸盐
+            if (ionTable[hIndex] > 0) {
+                for (let i = sedimentTable.length - 1; i >= 0; i--) {
+                    const sediment = sedimentTable[i];
+                    if (co3.includes(sediment.type)) {
+                        // 计算可溶解的沉淀量（受氢离子限制）
+                        const maxDissolve = ionTable[hIndex] / 2;
+                        const dissolveAmount = Math.min(maxDissolve, sediment.num);
+                        
+                        if (dissolveAmount <= 0) continue;
+                        
+                        // 溶解沉淀
+                        sediment.num -= dissolveAmount;
+                        ionTable[hIndex] -= dissolveAmount * 2;
+                        
+                        // 获取沉淀中的阳离子
+                        const indexInCo3 = co3.indexOf(sediment.type);
+                        if (indexInCo3 !== -1) {
+                            const cationIndex = co3ion[indexInCo3];
+                            // 释放阳离子（1个沉淀分子释放1个阳离子）
+                            ionTable[cationIndex] += dissolveAmount;
+                            
+                            // 更新反应方程
+                            setEquation(`2H⁺ + ${sediment.type} → H₂O + CO₂ + ${mt[cationIndex]}`, "碳酸盐与酸反应生成二氧化碳");
+                            addLog(`溶解碳酸盐: 2H⁺ + ${sediment.type} → H₂O + CO₂ + ${mt[cationIndex]} (${dissolveAmount.toFixed(4)} mol)`);
+                        }
+                        
+                        // 如果沉淀完全溶解，从表中移除
+                        if (sediment.num <= 0) {
+                            sedimentTable.splice(i, 1);
+                        }
+                        
+                        // 创建气泡动画
+                        createBubbles();
+                        
+                        // 如果氢离子耗尽，停止处理
+                        if (ionTable[hIndex] <= 0) break;
+                    }
+                }
+            }
+        }
+        
+        // 处理碱沉淀与H+的反应
+        function processBaseSediment() {
+            const hIndex = mt.indexOf("H⁺");
+            
+            if (ionTable[hIndex] > 0) {
+                for (let i = sedimentTable.length - 1; i >= 0; i--) {
+                    const sediment = sedimentTable[i];
+                    
+                    // 检查是否是碱沉淀
+                    if (baseSediments.includes(sediment.type) && mall[sediment.type]) {
+                        const baseInfo = mall[sediment.type];
+                        
+                        // 获取OH-的数量（通常是第二个离子）
+                        const ohCount = baseInfo.counts[1];
+                        
+                        // 计算可以溶解的量
+                        const maxDissolve = Math.min(sediment.num, ionTable[hIndex] / ohCount);
+                        
+                        if (maxDissolve > 0) {
+                            // 消耗H+
+                            ionTable[hIndex] -= maxDissolve * ohCount;
+                            
+                            // 释放阳离子
+                            const cationIndex = baseInfo.ions[0];
+                            ionTable[cationIndex] += maxDissolve * baseInfo.counts[0];
+                            
+                            // 减少沉淀量
+                            sediment.num -= maxDissolve;
+                            
+                            // 更新反应方程
+                            setEquation(`${sediment.type} + ${ohCount}H⁺ → ${mt[cationIndex]} + ${ohCount}H₂O`, "碱沉淀与酸反应");
+                            addLog(`溶解碱沉淀: ${sediment.type} + ${ohCount}H⁺ → ${mt[cationIndex]} + ${ohCount}H₂O (${maxDissolve.toFixed(4)} mol)`);
+                            
+                            // 如果沉淀完全溶解，从表中移除
+                            if (sediment.num <= 0) {
+                                sedimentTable.splice(i, 1);
+                            }
+                            
+                            // 如果氢离子耗尽，停止处理
+                            if (ionTable[hIndex] <= 0) break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 更新显示
+        function updateDisplay() {
+            // 更新沉淀显示
+            updateSedimentDisplay();
+            
+            // 更新离子显示
+            updateIonDisplay();
+            
+            // 更新烧杯状态
+            updateBeaker();
+        }
+        
+        // 更新沉淀显示
+        function updateSedimentDisplay() {
+            const container = document.getElementById('sediment-container');
+            container.innerHTML = '';
+            
+            if (sedimentTable.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无沉淀生成</div>';
+                return;
+            }
+            
+            sedimentTable.forEach(sediment => {
+                if (sediment.num > 0) {
+                    const item = document.createElement('div');
+                    item.className = 'sediment-item';
+                    item.innerHTML = `
+                        <div class="sediment-formula">${sediment.type}</div>
+                        <div class="sediment-amount">${sediment.num.toFixed(4)} mol</div>
+                    `;
+                    container.appendChild(item);
+                }
+            });
+        }
+        
+        // 更新离子显示
+        function updateIonDisplay() {
+            const list = document.getElementById('ion-list');
+            list.innerHTML = '';
+            
+            // 检查是否有离子
+            const hasIons = ionTable.some(val => val > 0);
+            if (!hasIons) {
+                list.innerHTML = '<div class="empty-state">溶液中暂无离子</div>';
+                return;
+            }
+            
+            // 添加离子显示
+            for (let i = 0; i < mt.length; i++) {
+                if (ionTable[i] > 0) {
+                    const amount = ionTable[i];
+                    const isCation = i < 14; // 前14个是阳离子
+                    
+                    const item = document.createElement('div');
+                    item.className = `ion-item ${isCation ? 'ion-cation' : 'ion-anion'}`;
+                    item.innerHTML = `
+                        <div class="ion-symbol">${mt[i]}</div>
+                        <div class="ion-name">${ionNames[i]}</div>
+                        <div class="ion-amount">${amount.toFixed(4)} mol</div>
+                    `;
+                    list.appendChild(item);
+                }
+            }
+        }
+        
+        // 更新烧杯状态
+        function updateBeaker() {
+            const precipitateContainer = document.getElementById('precipitate');
+            precipitateContainer.innerHTML = '';
+            
+            // 如果有沉淀，添加沉淀效果
+            if (sedimentTable.length > 0) {
+                for (let i = 0; i < 40; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('precipitate');
+                    
+                    const size = Math.random() * 10 + 3;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    
+                    const duration = Math.random() * 10 + 5;
+                    const delay = Math.random() * 5;
+                    particle.style.animation = `precipitate ${duration}s linear ${delay}s forwards`;
+                    
+                    precipitateContainer.appendChild(particle);
+                }
+            }
+        }
+        
+        // 设置反应方程
+        function setEquation(eq, info) {
+            document.getElementById('equation').textContent = eq;
+            document.getElementById('equation-info').textContent = info;
+        }
+        
+        // 创建气泡动画
+        function createBubbles() {
+            const bubblesContainer = document.getElementById('bubbles');
+            bubblesContainer.innerHTML = '';
+            
+            for (let i = 0; i < 15; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                const size = Math.random() * 15 + 5;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}%`;
+                
+                const duration = Math.random() * 8 + 4;
+                const delay = Math.random() * 5;
+                bubble.style.animation = `rise ${duration}s linear ${delay}s infinite`;
+                
+                bubblesContainer.appendChild(bubble);
+            }
+        }
+        
+        // 添加日志
+        function addLog(message) {
+            const logContent = document.getElementById('reaction-log-content');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = message;
+            logContent.prepend(logEntry);
+            
+            // 限制日志数量
+            if (logContent.children.length > 20) {
+                logContent.removeChild(logContent.lastChild);
+            }
+        }
+    </script>
+</body>
+</html>

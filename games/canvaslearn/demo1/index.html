@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>title</title>
+        <style>
+            #canvas {
+                background-color: rgb(159, 247, 135);
+            }
+        </style>
+    </head>
+    <body>
+        <div>11111</div>
+        <canvas id="canvas" width="500" height="500"><div>not</div></canvas>
+        <script>
+            var cavs = document.getElementById("canvas");
+            var ctx = cavs.getContext("2d");
+
+            //划线
+            // ctx.beginPath();
+            // ctx.moveTo(100,100);
+            // ctx.lineTo(200,200);
+            // ctx.stroke();
+
+            // 画矩形
+            ctx.rect(50,50,150,150);
+            // ctx.stroke();
+            ctx.fill();
+
+            // betterway
+            // ctx.strokeRect(200,200,100,100);
+            ctx.fillRect(200,200,100,100);
+
+            //clear
+            ctx.clearRect(150,150,50,50);
+
+        </script>
+    </body>
+</html>
