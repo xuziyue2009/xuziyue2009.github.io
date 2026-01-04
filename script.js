@@ -31,8 +31,8 @@ window.onload = function updateClock(){
         case 6:
             day = "星期六";
             break;
-        case 7:
-            day = "星期七";
+        case 0:
+            day = "星期日";
             break;
         default:
             day = "-";
