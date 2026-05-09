@@ -46,3 +46,16 @@ window.onload = function updateClock(){
 
     setTimeout(updateClock, 1000);
 }
+
+// 主题切换
+document.getElementById('theme-toggle').addEventListener('click', function() {
+    document.body.classList.toggle('dark');
+});
+
+// 搜索功能
+document.getElementById('search').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        var query = e.target.value;
+        window.location.href = '/tools/index.html?q=' + encodeURIComponent(query);
+    }
+});

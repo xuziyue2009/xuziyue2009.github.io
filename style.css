@@ -12,6 +12,24 @@ body {
     background: #F0F8FF;
 }
    
+.dark body {
+    background: #333;
+    color: #fff;
+}
+
+.dark .header {
+    background: #444;
+}
+
+.dark .card {
+    background: #555;
+    color: #fff;
+}
+
+.dark .card a {
+    color: #add8e6;
+}
+   
 /* 头部标题 */
 .header {
     padding: 30px;
@@ -32,22 +50,26 @@ body {
 /* 导航条 */
 .topnav {
     overflow: hidden;
-    background-color: #333;
+    background-color: white;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
    
 /* 导航条链接 */
 .topnav a {
     float: left;
     display: block;
-    color: #f2f2f2;
+    color: #000;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
+    transition: background 0.3s ease;
 }
    
 /* 链接颜色修改 */
 .topnav a:hover {
-    background-color: #ddd;
+    background-color: #f8f2ea;
     color: black;
 }
   

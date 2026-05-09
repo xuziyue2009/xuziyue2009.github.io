@@ -14,12 +14,21 @@
 
         <meta name="description" content="xzy的个人网站，有一些简单的小游戏，小工具等" />
         <meta http-equiv='content-language' content='zh-cn'>
+        <link rel="preload" href="media/logo.png" as="image">
     </head>
     <body>
+        <div class="topnav">
+            <a href="/">首页</a>
+            <a href="/tools/index.html">工具</a>
+            <a href="/games/index.html">游戏</a>
+            <a href="/blogs/index.html">博客</a>
+        </div>
         <div class="header">
-            <img src="media/logo.png" alt="logo" width="40px" height="40px">
+            <img src="media/logo.png" alt="logo" width="40px" height="40px" loading="lazy">
             <h1>xzy的网站</h1>
             <h3>团结的人民永远不会被击溃！</h3>
+            <input type="text" id="search" placeholder="搜索工具或游戏...">
+            <button id="theme-toggle">切换主题</button>
             <div id="date">now_date</div>
             <div id="time">now_time</div>
         </div>
@@ -42,6 +51,14 @@
                     </a>
                 </div>
 
+                <div class="card">
+                    <a href="/blogs/index.html">
+                        <h2>博客</h2>
+                        <h5>blogs</h5>
+                        <p>分享一些文章和笔记</p>
+                    </a>
+                </div>
+
                 <!-- <div class="card">
                     <a href="xxxx.html">
                         <h2>标题1</h2>
@@ -61,6 +78,8 @@
                       2023/12/01 重写界面
                       <br>
                       2026/1/4 恢复维护与更新
+                      <br>
+                      2026/5/9 添加导航栏、博客板块和搜索功能
                     </p>
                 </div>
                 <div class="card">
@@ -69,7 +88,11 @@
                 </div>
                 <div class="card">
                     <h3>友链</h3>
-                    <a href="https://wchengk09.github.io/">wck的网站</a>
+                    <ul>
+                        <li><a href="https://wchengk09.github.io/">wck的网站</a></li>
+                        <li><a href="https://example.com/">示例网站1</a></li>
+                        <li><a href="https://example2.com/">示例网站2</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
