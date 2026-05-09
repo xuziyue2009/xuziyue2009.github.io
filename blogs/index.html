@@ -2,27 +2,47 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>blog</title>
+        <title>xzy的网站 - 博客</title>
         <link rel="shortcut icon" href="xuziyue2009.github.io/favicon.ico"></link>
+        <link rel="stylesheet" type="text/css" href="/style.css">
+        <script src="/script.js"></script>
     </head>
     <body>
-        <a href="note/index.html">
-            <div style="width: calc(100% - 30px); margin: 10px; padding: 5px; background-color: #ced6e0; border-radius: 20px; display: inline-block; vertical-align: top; color:black;">
-                <img src="/media/note.png" style="width:25%; width: 80px !important; height: 80px !important; vertical-align: top;">
-                <div style="display: inline-block; vertical-align:top;">
-                    <h3 style="margin-bottom: 0;">笔记</h3>
-                <p style="display: inline-block; vertical-align:top;">note</p>
+        <div class="topnav">
+            <a href="/">首页</a>
+            <a href="/tools/index.html">工具</a>
+            <a href="/games/index.html">游戏</a>
+            <a href="/blogs/index.html">博客</a>
+        </div>
+        <div class="header">
+            <img src="/media/logo.png" alt="logo" width="40px" height="40px">
+            <h1>博客</h1>
+            <div id="date">now_date</div>
+            <div id="time">now_time</div>
+        </div>
+
+        <div class="row">
+            <div class="fullcolumn">
+                <div class="card">
+                    <a href="note/index.html">
+                        <h2>笔记</h2>
+                        <h5>note</h5>
+                        <p>分享一些笔记和学习内容</p>
+                    </a>
+                </div>
+
+                <div class="card">
+                    <a href="others/index.html">
+                        <h2>其他</h2>
+                        <h5>others</h5>
+                        <p>其他文章和杂谈</p>
+                    </a>
                 </div>
             </div>
-        </a>
-        <a href="others/index.html">
-            <div style="width: calc(100% - 30px); margin: 10px; padding: 5px; background-color: #ced6e0; border-radius: 20px; display: inline-block; vertical-align: top; color:black;">
-                <img src="/media/note.png" style="width:25%; width: 80px !important; height: 80px !important; vertical-align: top;">
-                <div style="display: inline-block; vertical-align:top;">
-                    <h3 style="margin-bottom: 0;">其他</h3>
-                <p style="display: inline-block; vertical-align:top;">others</p>
-                </div>
-            </div>
-        </a>
+        </div>
+
+        <div class="footer">
+            -xzy的网站-
+        </div> 
     </body>
 </html>
