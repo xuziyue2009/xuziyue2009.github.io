@@ -93,7 +93,8 @@ p {
 }
 
 .header img {
-    margin-bottom: 1rem;
+    display: block;
+    margin: 0 auto 1rem;
 }
 
 .header h1 {
