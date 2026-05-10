@@ -41,21 +41,84 @@ window.onload = function updateClock(){
     var time = hour + ":" + minute + ":" + second;
     var fulldate = year + "/"+ month + "/" + date + " " + day;
 
-    document.getElementById("date").innerHTML = fulldate;
-    document.getElementById("time").innerHTML = time;
+    var dateEl = document.getElementById("date");
+    var timeEl = document.getElementById("time");
+
+    if (dateEl) dateEl.innerHTML = fulldate;
+    if (timeEl) timeEl.innerHTML = time;
 
     setTimeout(updateClock, 1000);
 }
 
-// 主题切换
-document.getElementById('theme-toggle').addEventListener('click', function() {
-    document.body.classList.toggle('dark');
-});
+function getQueryParam(name) {
+    var params = new URLSearchParams(window.location.search);
+    return params.get(name) || "";
+}
 
-// 搜索功能
-document.getElementById('search').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        var query = e.target.value;
-        window.location.href = '/tools/index.html?q=' + encodeURIComponent(query);
+function searchSite(query) {
+    if (!query) return;
+    var target = '/tools/index.html?q=' + encodeURIComponent(query.trim());
+    window.location.href = target;
+}
+
+function setupSearch() {
+    var searchInput = document.getElementById('search');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+            searchSite(searchInput.value);
+        }
+    });
+
+    var query = getQueryParam('q');
+    if (query) {
+        searchInput.value = decodeURIComponent(query);
+        if (window.location.pathname.endsWith('/tools/index.html') || window.location.pathname === '/tools/') {
+            applyToolsSearch(query);
+        }
     }
-});
+}
+
+function applyToolsSearch(query) {
+    var keyword = query.trim().toLowerCase();
+    if (!keyword) return;
+
+    var cards = document.querySelectorAll('.card');
+    var matches = 0;
+
+    cards.forEach(function(card) {
+        var text = card.textContent.toLowerCase();
+        var visible = keyword.split(/\s+/).every(function(term) {
+            return term && text.indexOf(term) !== -1;
+        });
+
+        card.style.display = visible ? '' : 'none';
+        if (visible) matches++;
+    });
+
+    var searchMessage = document.getElementById('search-message');
+    if (!searchMessage) {
+        searchMessage = document.createElement('div');
+        searchMessage.id = 'search-message';
+        searchMessage.style.marginTop = '1rem';
+        searchMessage.style.color = 'var(--muted)';
+        var header = document.querySelector('.header');
+        if (header) header.appendChild(searchMessage);
+    }
+
+    searchMessage.textContent = matches > 0 ? '找到 ' + matches + ' 个结果' : '未找到匹配项';
+}
+
+function setupThemeToggle() {
+    var themeButton = document.getElementById('theme-toggle');
+    if (!themeButton) return;
+
+    themeButton.addEventListener('click', function() {
+        document.body.classList.toggle('dark');
+    });
+}
+
+setupSearch();
+setupThemeToggle();
