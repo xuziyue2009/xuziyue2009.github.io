@@ -48,58 +48,22 @@ window.onload = function updateClock(){
     if (timeEl) timeEl.innerHTML = time;
 
     setTimeout(updateClock, 1000);
-};
 
-var siteSearchIndex = [
-    {
-        title: '一些小工具',
-        description: '小工具集合，包含多个实用工具。',
-        url: '/tools/index.html',
-        tags: ['工具', '小工具', 'tools']
-    },
-    {
-        title: '离子反应模拟器',
-        description: '离子反应模拟 by.hzh。',
-        url: '/tools/aqsimbyhzh.html',
-        tags: ['工具', '离子', '化学']
-    },
-    {
-        title: '质数判断',
-        description: '判断一个数是否为质数。',
-        url: '/tools/isprime.html',
-        tags: ['工具', '数学', '质数']
-    },
-    {
-        title: '分解质因数',
-        description: '把合数写成几个质数相乘的形式。',
-        url: '/tools/fenjie.html',
-        tags: ['工具', '数学', '质因数']
-    },
-    {
-        title: '拼图游戏',
-        description: '挑战你的拼图技能。',
-        url: '/games/puzzle/index.html',
-        tags: ['游戏', '拼图']
-    },
-    {
-        title: '找不同',
-        description: '超级找不同游戏。',
-        url: '/games/super/index.html',
-        tags: ['游戏', '找不同', 'super']
-    },
-    {
-        title: '博客',
-        description: '分享文章与笔记。',
-        url: '/blogs/index.html',
-        tags: ['博客', '笔记', '文章']
-    },
-    {
-        title: '文件',
-        description: '提供可下载文件。',
-        url: '/files/index.html',
-        tags: ['文件', '下载']
+    // Load search index for search page
+    if (isSearchPage() && !window.siteSearchIndex) {
+        fetch('/searchIndex.json')
+            .then(response => response.json())
+            .then(data => {
+                window.siteSearchIndex = data;
+                var query = getQueryParam('q');
+                if (query) {
+                    var results = findMatches(query);
+                    renderSearchResults(results, query);
+                }
+            })
+            .catch(error => console.error('Failed to load search index:', error));
     }
-];
+};
 
 function getQueryParam(name) {
     var params = new URLSearchParams(window.location.search);
@@ -119,7 +83,17 @@ function searchSite(query) {
         return;
     }
 
-    window.location.href = '/search.html?q=' + encodeURIComponent(trimmed);
+    if (window.siteSearchIndex) {
+        window.location.href = '/search.html?q=' + encodeURIComponent(trimmed);
+    } else {
+        fetch('/searchIndex.json')
+            .then(response => response.json())
+            .then(data => {
+                window.siteSearchIndex = data;
+                window.location.href = '/search.html?q=' + encodeURIComponent(trimmed);
+            })
+            .catch(error => console.error('Failed to load search index:', error));
+    }
 }
 
 function normalize(text) {
