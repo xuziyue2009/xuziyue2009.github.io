@@ -284,7 +284,7 @@ function setupThemeToggle() {
     });
 }
 
-window.addEventListener('DOMContentLoaded', function() {
+function initPage() {
     initializeTheme();
     setupSearch();
     setupThemeToggle();
@@ -295,6 +295,16 @@ window.addEventListener('DOMContentLoaded', function() {
             renderSearchResults(findMatches(query), decodeURIComponent(query || ''));
         });
     }
-});
+}
 
-window.addEventListener('load', updateClock);
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', initPage);
+} else {
+    initPage();
+}
+
+if (document.readyState === 'complete') {
+    updateClock();
+} else {
+    window.addEventListener('load', updateClock);
+}
