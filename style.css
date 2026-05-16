@@ -214,6 +214,38 @@ button:focus {
     color: var(--accent);
 }
 
+.highlight {
+    display: inline-block;
+    background: rgba(255, 229, 100, 0.45);
+    border-radius: 4px;
+    padding: 0 4px;
+}
+
+body.dark .highlight {
+    background: rgba(255, 209, 72, 0.2);
+}
+
+#search-results {
+    display: grid;
+    gap: 18px;
+}
+
+.search-summary {
+    margin-bottom: 1rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.card.no-results {
+    text-align: center;
+}
+
+.search-path {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+}
+
 .card p {
     margin-bottom: 0;
 }
@@ -236,6 +268,18 @@ button:focus {
         width: 100%;
         flex: 1 1 auto;
     }
+
+    .header {
+        padding: 22px 18px;
+    }
+
+    .header h1 {
+        font-size: clamp(2rem, 6vw, 3rem);
+    }
+
+    .card {
+        padding: 18px;
+    }
 }
 
 @media (max-width: 600px) {
@@ -245,6 +289,17 @@ button:focus {
 
     .topnav a {
         flex: 1 1 auto;
+        min-width: 0;
+        padding: 10px 12px;
+    }
+
+    .header {
+        padding: 18px 12px;
+    }
+
+    .header img {
+        width: 48px;
+        height: 48px;
     }
 }
 

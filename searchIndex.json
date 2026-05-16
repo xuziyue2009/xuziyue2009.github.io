@@ -1,44 +1,86 @@
 [
     {
         "title": "一些小工具",
-        "description": "小工具集合，包含多个实用工具。",
+        "description": "小工具集合，包含多个实用工具",
         "url": "/tools/index.html",
         "tags": ["工具", "小工具", "tools"]
     },
     {
         "title": "离子反应模拟器",
-        "description": "离子反应模拟 by.hzh。",
+        "description": "离子反应模拟 by.hzh",
         "url": "/tools/aqsimbyhzh.html",
         "tags": ["工具", "离子", "化学"]
     },
     {
         "title": "质数判断",
-        "description": "判断一个数是否为质数。",
+        "description": "判断一个数是否为质数",
         "url": "/tools/isprime.html",
         "tags": ["工具", "数学", "质数"]
     },
     {
         "title": "分解质因数",
-        "description": "把合数写成几个质数相乘的形式。",
+        "description": "把合数写成几个质数相乘的形式",
         "url": "/tools/fenjie.html",
         "tags": ["工具", "数学", "质因数"]
     },
     {
         "title": "找不同",
-        "description": "超级找不同游戏。",
+        "description": "找不同游戏",
         "url": "/games/super/index.html",
         "tags": ["游戏", "找不同", "super"]
     },
     {
         "title": "博客",
-        "description": "分享文章与笔记。",
+        "description": "分享文章与笔记",
         "url": "/blogs/index.html",
         "tags": ["博客", "笔记", "文章"]
     },
     {
         "title": "文件",
-        "description": "提供可下载文件。",
+        "description": "提供可下载文件",
         "url": "/files/index.html",
         "tags": ["文件", "下载"]
+    },
+    {
+        "title": "网站推荐",
+        "description": "收集和推荐有意思的网站。",
+        "url": "/webs.html",
+        "tags": ["网站", "推荐", "链接"]
+    },
+    {
+        "title": "首页",
+        "description": "xzy的个人网站主页，展示工具、游戏、博客与文件入口",
+        "url": "/",
+        "tags": ["首页", "主页", "xzy"]
+    },
+    {
+        "title": "小游戏",
+        "description": "游戏目录页，包含多个浏览和访问入口",
+        "url": "/games/index.html",
+        "tags": ["游戏", "目录", "小游戏"]
+    },
+    {
+        "title": "拼图",
+        "description": "拼图游戏页面，体验数字华容道",
+        "url": "/games/puzzle/index.html",
+        "tags": ["游戏", "数字华容道", "puzzle"]
+    },
+    {
+        "title": "博客 · 其他",
+        "description": "其他博客文章和杂谈页面",
+        "url": "/blogs/others/index.html",
+        "tags": ["博客", "其他", "杂谈"]
+    },
+    {
+        "title": "雪人 ASCII",
+        "description": "snowman:P 页面，展示一个 ASCII 艺术作品",
+        "url": "/blogs/others/snowman.html",
+        "tags": ["博客", "艺术", "ASCII", "snowman"]
+    },
+    {
+        "title": "博客 · 笔记",
+        "description": "博客笔记页面",
+        "url": "/blogs/note/index.html",
+        "tags": ["博客", "笔记", "notes"]
     }
 ]
