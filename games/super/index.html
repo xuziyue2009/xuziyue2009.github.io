@@ -1,13 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>找不同 - xzy的网站</title>
         <link rel="shortcut icon" href="/favicon.ico">
         <link rel="stylesheet" type="text/css" href="/style.css">
-        <meta name="description" content="找不同游戏页面，展示游戏视频和玩法。">
+        <meta name="description" content="找不同游戏页面，考验你的观察力。">
         <meta http-equiv="content-language" content="zh-cn">
+        <style>
+            .game-content {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            .game-content h2 {
+                text-align: center;
+                color: var(--text);
+            }
+            .diff-area {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                justify-content: center;
+                margin: 20px 0;
+            }
+            .diff-pair {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+            }
+            .diff-canvas {
+                border: 2px solid var(--border);
+                border-radius: 8px;
+                cursor: crosshair;
+                max-width: 100%;
+                height: auto;
+                touch-action: manipulation;
+            }
+            .diff-score {
+                text-align: center;
+                font-size: 1.3rem;
+                margin: 10px 0;
+                color: var(--accent);
+                font-weight: bold;
+            }
+            .diff-feedback {
+                text-align: center;
+                min-height: 2em;
+                font-size: 1.1rem;
+                color: var(--text);
+            }
+            .diff-controls {
+                display: flex;
+                gap: 12px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .diff-controls button {
+                padding: 10px 24px;
+                font-size: 1rem;
+            }
+            .diff-list {
+                list-style: none;
+                padding: 0;
+                text-align: center;
+                color: var(--muted);
+            }
+            .diff-list li.found {
+                text-decoration: line-through;
+                color: #4CAF50;
+            }
+            video {
+                display: block;
+                margin: 0 auto;
+                max-width: 100%;
+                border-radius: 8px;
+            }
+        </style>
     </head>
     <body>
         <div class="topnav">
@@ -25,26 +96,287 @@
             <div id="date">now_date</div>
             <div id="time">now_time</div>
         </div>
-        <div class="game-content">
-            <h1>找不同</h1>
+        <div class="row">
+            <div class="fullcolumn">
+                <div class="card">
+                    <div class="game-content">
+                        <h2>观察两张图片，找出所有不同之处！</h2>
 
-            <video width="320" height="240" controls>  
-                <source src="/media/video/Super.mp4" type="video/mp4">
-                您的浏览器不支持Video标签。  
-            </video>  
+                        <div class="diff-score">得分：<span id="points">0</span> / <span id="total-diffs">5</span></div>
+                        <div class="diff-feedback" id="feedback"></div>
 
-            <div id="points">分数：0</div>
+                        <div class="diff-area">
+                            <div class="diff-pair">
+                                <canvas class="diff-canvas" id="canvas-left" width="300" height="240"></canvas>
+                                <canvas class="diff-canvas" id="canvas-right" width="300" height="240"></canvas>
+                            </div>
+                        </div>
 
-            <div id="variants"></div>
-            <div id="inputans"></div>
-            <div id="buttonDiv"></div>
-            
-            <!-- <button onclick="create()">生成</button> -->
+                        <div class="diff-controls">
+                            <button id="btn-new-game">新游戏</button>
+                            <button id="btn-hint">提示 (-1分)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
         <div class="footer">
             -xzy的网站-
         </div>
+        <script>
+(function() {
+    var W = 300, H = 240;
+    var leftCanvas = document.getElementById('canvas-left');
+    var rightCanvas = document.getElementById('canvas-right');
+    var ctxL = leftCanvas.getContext('2d');
+    var ctxR = rightCanvas.getContext('2d');
+    var pointsEl = document.getElementById('points');
+    var totalEl = document.getElementById('total-diffs');
+    var feedbackEl = document.getElementById('feedback');
+
+    var diffs = [];
+    var found = [];
+    var score = 0;
+    var totalDiffs = 5;
+    var diffRadius = 18;
+
+    function randomColor() {
+        var r = Math.floor(Math.random() * 200);
+        var g = Math.floor(Math.random() * 200);
+        var b = Math.floor(Math.random() * 200);
+        return 'rgb(' + r + ',' + g + ',' + b + ')';
+    }
+
+    function drawScene(ctx, cx, cy, shapes) {
+        ctx.fillStyle = '#E8F4FD';
+        ctx.fillRect(0, 0, W, H);
+
+        // Sky gradient
+        var sky = ctx.createLinearGradient(0, 0, 0, H);
+        sky.addColorStop(0, '#87CEEB');
+        sky.addColorStop(0.6, '#B0E0E6');
+        sky.addColorStop(1, '#90EE90');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, W, H);
+
+        // Sun
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.arc(240, 40, 30, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Clouds
+        ctx.fillStyle = '#fff';
+        drawCloud(ctx, 50, 35, 1);
+        drawCloud(ctx, 160, 25, 0.8);
+        drawCloud(ctx, 100, 55, 0.7);
+
+        // House
+        ctx.fillStyle = '#DEB887';
+        ctx.fillRect(100, 130, 80, 70);
+        // Roof
+        ctx.fillStyle = '#CD853F';
+        ctx.beginPath();
+        ctx.moveTo(90, 130);
+        ctx.lineTo(140, 90);
+        ctx.lineTo(190, 130);
+        ctx.closePath();
+        ctx.fill();
+        // Door
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(130, 160, 20, 40);
+        // Window
+        ctx.fillStyle = '#ADD8E6';
+        ctx.fillRect(110, 145, 15, 15);
+
+        // Tree
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(225, 150, 10, 50);
+        ctx.fillStyle = '#228B22';
+        ctx.beginPath();
+        ctx.arc(230, 130, 30, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Fence
+        ctx.strokeStyle = '#8B4513';
+        ctx.lineWidth = 2;
+        for (var i = 0; i < 5; i++) {
+            var fx = 10 + i * 18;
+            ctx.beginPath();
+            ctx.moveTo(fx, 190);
+            ctx.lineTo(fx, 170);
+            ctx.stroke();
+        }
+        ctx.beginPath();
+        ctx.moveTo(5, 178);
+        ctx.lineTo(85, 178);
+        ctx.stroke();
+
+        // Flowers
+        var flowerColors = ['#FF69B4', '#FF6347', '#FFD700', '#9B59B6'];
+        for (var f = 0; f < 4; f++) {
+            ctx.fillStyle = flowerColors[f];
+            ctx.beginPath();
+            ctx.arc(250 + f * 12, 195, 4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Apply differences
+        for (var d = 0; d < diffs.length; d++) {
+            var diff = diffs[d];
+            var canvasCtx = (cx === 'left') ? ctx : null;
+            if (cx === 'right') {
+                // On right canvas, apply the difference
+                ctx.fillStyle = diff.color;
+                ctx.beginPath();
+                ctx.arc(diff.x, diff.y, diff.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+
+    function drawCloud(ctx, x, y, scale) {
+        ctx.beginPath();
+        ctx.arc(x, y, 15 * scale, 0, Math.PI * 2);
+        ctx.arc(x + 18 * scale, y - 5, 12 * scale, 0, Math.PI * 2);
+        ctx.arc(x + 35 * scale, y, 15 * scale, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function generateDiffs() {
+        diffs = [];
+        found = [];
+        score = 0;
+        var used = [];
+        for (var i = 0; i < totalDiffs; i++) {
+            var x, y, tooClose;
+            do {
+                x = 30 + Math.random() * (W - 60);
+                y = 30 + Math.random() * (H - 60);
+                tooClose = false;
+                for (var j = 0; j < used.length; j++) {
+                    var dx = x - used[j][0];
+                    var dy = y - used[j][1];
+                    if (Math.sqrt(dx * dx + dy * dy) < 35) {
+                        tooClose = true;
+                        break;
+                    }
+                }
+            } while (tooClose);
+            used.push([x, y]);
+            diffs.push({
+                x: x,
+                y: y,
+                size: 8 + Math.random() * 12,
+                color: randomColor(),
+                found: false
+            });
+        }
+    }
+
+    function render() {
+        drawScene(ctxL, 'left');
+        drawScene(ctxR, 'right');
+
+        // Draw found markers on left canvas
+        for (var i = 0; i < diffs.length; i++) {
+            if (found[i]) {
+                ctxL.strokeStyle = '#4CAF50';
+                ctxL.lineWidth = 3;
+                ctxL.beginPath();
+                ctxL.arc(diffs[i].x, diffs[i].y, diffs[i].size + 6, 0, Math.PI * 2);
+                ctxL.stroke();
+            }
+        }
+
+        pointsEl.textContent = score;
+        totalEl.textContent = totalDiffs;
+    }
+
+    function checkClick(canvas, clickX, clickY) {
+        var rect = canvas.getBoundingClientRect();
+        var scaleX = W / rect.width;
+        var scaleY = H / rect.height;
+        var x = (clickX - rect.left) * scaleX;
+        var y = (clickY - rect.top) * scaleY;
+
+        for (var i = 0; i < diffs.length; i++) {
+            if (found[i]) continue;
+            var dx = x - diffs[i].x;
+            var dy = y - diffs[i].y;
+            if (Math.sqrt(dx * dx + dy * dy) < diffs[i].size + 8) {
+                found[i] = true;
+                score++;
+                feedbackEl.textContent = '✅ 找到了！(' + score + '/' + totalDiffs + ')';
+                feedbackEl.style.color = '#4CAF50';
+                render();
+                if (score >= totalDiffs) {
+                    feedbackEl.textContent = '🎉 恭喜！你找到了所有不同之处！';
+                }
+                return;
+            }
+        }
+        score = Math.max(0, score - 1);
+        feedbackEl.textContent = '❌ 这里没有不同，扣1分';
+        feedbackEl.style.color = '#E74C3C';
+        pointsEl.textContent = score;
+    }
+
+    function showHint() {
+        for (var i = 0; i < diffs.length; i++) {
+            if (!found[i]) {
+                score = Math.max(0, score - 1);
+                feedbackEl.textContent = '💡 提示已显示（扣1分）';
+                feedbackEl.style.color = '#FF9800';
+
+                // Flash the unfound diff
+                ctxL.strokeStyle = '#FF9800';
+                ctxL.lineWidth = 3;
+                ctxL.setLineDash([4, 4]);
+                ctxL.beginPath();
+                ctxL.arc(diffs[i].x, diffs[i].y, diffs[i].size + 10, 0, Math.PI * 2);
+                ctxL.stroke();
+                ctxL.setLineDash([]);
+                setTimeout(function() { render(); }, 1500);
+
+                pointsEl.textContent = score;
+                return;
+            }
+        }
+    }
+
+    function newGame() {
+        totalDiffs = 5;
+        generateDiffs();
+        feedbackEl.textContent = '';
+        render();
+    }
+
+    leftCanvas.addEventListener('click', function(e) {
+        checkClick(leftCanvas, e.clientX, e.clientY);
+    });
+    rightCanvas.addEventListener('click', function(e) {
+        checkClick(rightCanvas, e.clientX, e.clientY);
+    });
+
+    // Touch support
+    leftCanvas.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        var t = e.touches[0];
+        checkClick(leftCanvas, t.clientX, t.clientY);
+    });
+    rightCanvas.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        var t = e.touches[0];
+        checkClick(rightCanvas, t.clientX, t.clientY);
+    });
+
+    document.getElementById('btn-new-game').addEventListener('click', newGame);
+    document.getElementById('btn-hint').addEventListener('click', showHint);
+
+    newGame();
+})();
+        </script>
         <script src="/script.js" async></script>
     </body>
 </html>

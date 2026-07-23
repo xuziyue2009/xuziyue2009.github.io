@@ -109,8 +109,7 @@ p {
     color: var(--muted);
 }
 
-header .controls,
-.header .header-actions {
+.header .controls {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
