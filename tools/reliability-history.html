@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>设备可靠性历史记录 - xzy的网站</title>
+        <link rel="shortcut icon" href="/favicon.ico">
+        <link rel="stylesheet" type="text/css" href="/style.css">
+        <meta name="description" content="仿Windows可靠性历史记录功能，展示鼠标设备稳定性指数变化，支持记录丢帧、滚轮回滚、按键双击等问题。">
+        <meta http-equiv="content-language" content="zh-cn">
+        <style>
+            .reliability-container { max-width: 960px; margin: 20px auto 0; }
+
+            /* ---- Stats Row ---- */
+            .stats-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+            .stat-tile {
+                flex: 1; min-width: 120px; background: var(--surface);
+                border-radius: 12px; box-shadow: var(--shadow); padding: 16px 20px; text-align: center;
+            }
+            .stat-tile .stat-value { font-size: 1.8rem; font-weight: bold; color: var(--accent); }
+            .stat-tile .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+            .stat-tile.good .stat-value { color: #4CAF50; }
+            .stat-tile.warn .stat-value { color: #F9A825; }
+            .stat-tile.bad .stat-value { color: #E74856; }
+
+            /* ---- Monitor Card ---- */
+            .monitor-card {
+                background: var(--surface); border-radius: 12px;
+                box-shadow: var(--shadow); padding: 24px; margin-bottom: 20px;
+            }
+            .monitor-card h2 { margin: 0 0 4px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+            .monitor-card h2 .icon { font-size: 1.3rem; }
+            .monitor-card .subtitle { color: var(--muted); font-size: 0.85rem; margin: 0 0 16px; }
+
+            /* ---- Chart ---- */
+            .chart-wrapper { position: relative; width: 100%; height: 300px; margin: 8px 0 0; }
+            .chart-wrapper canvas { width: 100%; height: 100%; display: block; }
+            .chart-tooltip {
+                display: none; position: absolute;
+                background: var(--surface-strong); color: var(--text);
+                border: 1px solid var(--border); border-radius: 8px;
+                padding: 10px 14px; font-size: 0.85rem;
+                pointer-events: none; z-index: 10; white-space: nowrap;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+            .chart-tooltip .tt-date { font-weight: bold; margin-bottom: 2px; }
+            .chart-tooltip .tt-score { color: var(--accent); }
+            .chart-tooltip .tt-events { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+
+            .chart-legend { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 12px; font-size: 0.82rem; color: var(--muted); }
+            .chart-legend span { display: inline-flex; align-items: center; gap: 5px; }
+            .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+            .legend-dot.critical { background: #E74856; }
+            .legend-dot.warning  { background: #F9A825; }
+            .legend-dot.info     { background: var(--accent); }
+
+            /* ---- Report Button ---- */
+            .report-area { text-align: center; margin-bottom: 20px; }
+            .btn-report {
+                display: inline-flex; align-items: center; gap: 8px;
+                padding: 12px 28px; font-size: 1rem; font-weight: 600;
+                border: 2px solid #E74856; border-radius: 10px;
+                background: #E74856; color: #fff; cursor: pointer;
+                transition: all 0.2s ease;
+            }
+            .btn-report:hover { background: #d1343f; border-color: #d1343f; transform: translateY(-1px); }
+            .btn-report:active { transform: translateY(0); }
+
+            /* ---- Modal ---- */
+            .modal-overlay {
+                display: none; position: fixed; inset: 0;
+                background: rgba(0,0,0,0.5); z-index: 1000;
+                align-items: center; justify-content: center;
+            }
+            .modal-overlay.active { display: flex; }
+            .modal {
+                background: var(--surface); border-radius: 14px; padding: 28px;
+                max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            }
+            .modal h3 { margin: 0 0 8px; font-size: 1.2rem; }
+            .modal .modal-sub { color: var(--muted); font-size: 0.85rem; margin: 0 0 20px; }
+            .modal label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
+            .issue-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+            @media (max-width: 400px) { .issue-grid { grid-template-columns: 1fr; } }
+            .issue-option {
+                display: flex; align-items: center; gap: 10px;
+                padding: 10px 12px; border: 2px solid var(--border); border-radius: 10px;
+                cursor: pointer; transition: all 0.15s ease; font-size: 0.88rem;
+            }
+            .issue-option:hover { border-color: var(--accent); background: var(--surface-strong); }
+            .issue-option.selected { border-color: var(--accent); background: var(--surface-strong); }
+            .issue-option .io-icon {
+                width: 28px; height: 28px; border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 0.8rem; font-weight: bold; color: #fff; flex-shrink: 0;
+            }
+            .issue-option .io-icon.critical { background: #E74856; }
+            .issue-option .io-icon.warning  { background: #F9A825; color: #333; }
+            .issue-option .io-icon.info     { background: var(--accent); }
+            .issue-option .io-impact { margin-left: auto; font-size: 0.75rem; color: var(--muted); }
+
+            .modal textarea {
+                width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+                border-radius: 8px; background: var(--surface); color: var(--text);
+                font: inherit; resize: vertical; min-height: 60px; margin-bottom: 20px;
+            }
+            .modal textarea:focus { outline: none; border-color: var(--accent); }
+            .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
+            .btn {
+                padding: 10px 22px; border-radius: 8px; font-weight: 600;
+                border: none; cursor: pointer; font: inherit; transition: all 0.2s ease;
+            }
+            .btn-primary { background: #E74856; color: #fff; }
+            .btn-primary:hover { background: #d1343f; }
+            .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+            .btn-cancel { background: var(--surface-strong); color: var(--text); border: 1px solid var(--border); }
+            .btn-cancel:hover { background: var(--border); }
+
+            /* ---- Event List ---- */
+            .event-day-group { margin-bottom: 16px; }
+            .event-day-label {
+                font-weight: bold; font-size: 0.95rem; padding: 6px 0;
+                border-bottom: 1px solid var(--border); margin-bottom: 8px;
+            }
+            .event-item {
+                display: flex; align-items: flex-start; gap: 12px;
+                padding: 10px 12px; border-radius: 8px; transition: background 0.15s ease;
+            }
+            .event-item:hover { background: var(--surface-strong); }
+            .event-item .event-icon {
+                flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 0.85rem; font-weight: bold; color: #fff; margin-top: 2px;
+            }
+            .event-item .event-icon.critical { background: #E74856; }
+            .event-item .event-icon.warning  { background: #F9A825; color: #333; }
+            .event-item .event-icon.info     { background: var(--accent); }
+            .event-item .event-details { flex: 1; min-width: 0; }
+            .event-item .event-details .event-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
+            .event-item .event-details .event-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.4; }
+            .event-item .event-time { flex-shrink: 0; color: var(--muted); font-size: 0.82rem; }
+
+            .event-item .event-delete {
+                flex-shrink: 0; background: none; border: none; color: var(--muted);
+                cursor: pointer; font-size: 0.8rem; padding: 2px 6px; border-radius: 4px;
+                opacity: 0; transition: opacity 0.15s;
+            }
+            .event-item:hover .event-delete { opacity: 1; }
+            .event-item .event-delete:hover { color: #E74856; background: rgba(231,72,86,0.1); }
+
+            .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
+            .empty-state .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+
+            /* ---- Toast ---- */
+            .toast {
+                position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+                background: #333; color: #fff; padding: 12px 24px; border-radius: 8px;
+                font-size: 0.9rem; z-index: 2000; pointer-events: none;
+                opacity: 0; transition: opacity 0.3s ease;
+            }
+            .toast.show { opacity: 1; }
+
+            @media (max-width: 600px) {
+                .monitor-card { padding: 14px; }
+                .chart-wrapper { height: 220px; }
+                .stats-row { gap: 8px; }
+                .stat-tile { padding: 12px 10px; }
+                .stat-tile .stat-value { font-size: 1.4rem; }
+                .event-item .event-time { display: none; }
+                .modal { padding: 16px; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="topnav">
+            <a href="/">首页</a>
+            <a href="/tools/index.html">工具</a>
+            <a href="/games/index.html">游戏</a>
+            <a href="/blogs/index.html">博客</a>
+            <a href="/files/index.html">文件</a>
+        </div>
+        <div class="header">
+            <img src="/media/logo.png" alt="logo" width="40px" height="40px" loading="lazy">
+            <h1>设备可靠性历史记录</h1>
+            <input type="text" id="search" placeholder="搜索本站内容...">
+            <button id="theme-toggle">切换主题</button>
+            <div id="date">now_date</div>
+            <div id="time">now_time</div>
+            <p>鼠标 &mdash; 正常使用时稳定性逐渐恢复，发生问题时报告并记录</p>
+        </div>
+
+        <div class="reliability-container">
+
+            <!-- Summary Stats -->
+            <div class="stats-row">
+                <div class="stat-tile" id="tileIndex">
+                    <div class="stat-value" id="currentIndex">--</div>
+                    <div class="stat-label">当前稳定性指数</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-value" id="totalEvents">0</div>
+                    <div class="stat-label">累计事件数</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-value" id="criticalCount">0</div>
+                    <div class="stat-label">严重事件</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-value" id="daysSinceIssue">--</div>
+                    <div class="stat-label">距上次问题</div>
+                </div>
+            </div>
+
+            <!-- Report Button -->
+            <div class="report-area">
+                <button class="btn-report" id="btnOpenModal">⚠️ 记录鼠标问题</button>
+            </div>
+
+            <!-- Stability Chart -->
+            <div class="monitor-card">
+                <h2><span class="icon">📊</span> 稳定性指数趋势</h2>
+                <p class="subtitle">范围 1-10，正常使用时随时间对数恢复；发生问题则立即下降</p>
+                <div class="chart-wrapper" id="chartWrapper">
+                    <canvas id="stabilityChart"></canvas>
+                    <div class="chart-tooltip" id="chartTooltip"></div>
+                </div>
+                <div class="chart-legend">
+                    <span><span class="legend-dot info"></span> 轻微影响</span>
+                    <span><span class="legend-dot warning"></span> 中等影响</span>
+                    <span><span class="legend-dot critical"></span> 严重影响</span>
+                </div>
+            </div>
+
+            <!-- Event List -->
+            <div class="monitor-card">
+                <h2><span class="icon">📋</span> 详细事件记录</h2>
+                <p class="subtitle">所有问题记录与系统事件，按日期分组（可点击 ✕ 删除误报）</p>
+                <div class="event-list" id="eventList"></div>
+            </div>
+
+        </div>
+
+        <!-- Report Modal -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal">
+                <h3>记录鼠标问题</h3>
+                <p class="modal-sub">选择遇到的问题类型，系统将自动降低可靠性指数</p>
+                <label>问题类型</label>
+                <div class="issue-grid" id="issueGrid">
+                    <!-- Populated by JS -->
+                </div>
+                <label>补充说明（可选）</label>
+                <textarea id="issueNote" placeholder="例如：在游戏中突然丢帧约2秒..."></textarea>
+                <div class="modal-buttons">
+                    <button class="btn btn-cancel" id="btnCancel">取消</button>
+                    <button class="btn btn-primary" id="btnSubmit" disabled>记录问题</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast -->
+        <div class="toast" id="toast"></div>
+
+        <div class="footer">-xzy的网站-</div>
+
+        <script>
+(function() {
+    "use strict";
+
+    // ==================== Constants ====================
+    var RECOVERY_RATE = 0.5;      // per hour, exponential recovery rate
+    var MAX_INDEX = 10.0;
+    var MIN_INDEX = 1.0;
+    var INITIAL_INDEX = 7.0;      // starting index for a fresh device
+    var CHART_DAYS = 14;
+    var LIVE_UPDATE_MS = 30000;    // update index every 30s while page open
+
+    var STORAGE_KEY = "reliability_data";
+
+    // ==================== Issue Types ====================
+    var ISSUE_TYPES = [
+        { id: "frame_drop",      label: "鼠标丢帧",       impact: -1.5, severity: "warning",  icon: "!", desc: "指针移动不流畅、跳帧或卡顿" },
+        { id: "scroll_rollback", label: "滚轮回滚",       impact: -1.5, severity: "warning",  icon: "!", desc: "滚动时页面反向回弹" },
+        { id: "double_click",    label: "按键双击",       impact: -2.0, severity: "critical", icon: "✕", desc: "单击触发两次点击" },
+        { id: "disconnect",      label: "连接断开",       impact: -3.0, severity: "critical", icon: "✕", desc: "鼠标与接收器失去连接" },
+        { id: "driver_crash",    label: "驱动崩溃",       impact: -3.5, severity: "critical", icon: "✕", desc: "驱动程序无响应或报错" },
+        { id: "pointer_lag",     label: "指针延迟",       impact: -1.8, severity: "warning",  icon: "!", desc: "移动鼠标后指针明显滞后" },
+        { id: "side_button",     label: "侧键失灵",       impact: -1.3, severity: "warning",  icon: "!", desc: "侧键按下无反应或误触发" },
+        { id: "low_battery",     label: "电池不足",       impact: -0.8, severity: "info",     icon: "i", desc: "电量低于15%，影响性能" },
+        { id: "interference",    label: "信号干扰",       impact: -1.2, severity: "warning",  icon: "!", desc: "2.4GHz频段干扰导致不稳定" },
+        { id: "sensor_dirty",    label: "传感器脏污",     impact: -1.0, severity: "info",     icon: "i", desc: "移动轨迹异常或抖动" }
+    ];
+
+    // Quick lookup
+    var issueTypeMap = {};
+    ISSUE_TYPES.forEach(function(t) { issueTypeMap[t.id] = t; });
+
+    // ==================== Data Layer ====================
+    function loadData() {
+        try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                var data = JSON.parse(raw);
+                if (data.events && Array.isArray(data.events)) return data;
+            }
+        } catch (e) {}
+        return null;
+    }
+
+    function saveData(data) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+            showToast("存储空间不足，请清理旧数据");
+        }
+    }
+
+    function seedData() {
+        var now = Date.now();
+        var HOUR = 3600000;
+        var DAY = 24 * HOUR;
+        var events = [];
+        var evId = 0;
+
+        function add(hoursAgo, typeId, note) {
+            var t = issueTypeMap[typeId];
+            evId++;
+            events.push({
+                id: "seed_" + evId,
+                timestamp: now - Math.round(hoursAgo * HOUR),
+                typeId: typeId,
+                title: t.label,
+                impact: t.impact,
+                severity: t.severity,
+                note: note || t.desc,
+                isSeed: true
+            });
+        }
+
+        // Seed events spread over ~14 days
+        add(335, "frame_drop",      "游戏时出现短暂丢帧");
+        add(320, "interference",    "附近路由器干扰");
+        add(290, "pointer_lag",     "系统高负载时出现延迟");
+        add(260, "low_battery",     "电量降至12%");
+        add(215, "driver_crash",    "G HUB 驱动崩溃，重启后恢复");
+        add(195, "scroll_rollback", "浏览网页时滚轮回弹");
+        add(165, "double_click",    "左键偶尔双击，影响拖拽操作");
+        add(140, "side_button",     "前进侧键无响应");
+        add(110, "sensor_dirty",    "鼠标垫积灰导致追踪不准");
+        add(75,  "pointer_lag",     "蓝牙模式下延迟增大");
+        add(48,  "frame_drop",      "无线模式下偶尔丢帧");
+
+        return { events: events, lastUpdate: now };
+    }
+
+    // ==================== Index Calculation ====================
+    // Recovery formula: I(t) = 10 - (10 - I0) * exp(-k * t)
+    // where k = RECOVERY_RATE, t in hours
+    // This gives fast recovery at low index, slowing as it approaches 10
+    function recoverIndex(currentIndex, hoursElapsed) {
+        if (hoursElapsed <= 0) return currentIndex;
+        var gap = MAX_INDEX - currentIndex;
+        if (gap <= 0.001) return MAX_INDEX;
+        var newGap = gap * Math.exp(-RECOVERY_RATE * hoursElapsed / MAX_INDEX);
+        return MAX_INDEX - newGap;
+    }
+
+    function calculateCurrentIndex(events, fromTime, toTime) {
+        // Process all events in chronological order.
+        // Recovery is applied between consecutive timestamps using the exponential formula.
+        // Events before fromTime are still processed (they establish the index baseline);
+        // events after toTime are skipped.
+        var idx = INITIAL_INDEX;
+        var prevTs = fromTime;
+
+        var sorted = (events || []).slice().sort(function(a, b) { return a.timestamp - b.timestamp; });
+
+        for (var i = 0; i < sorted.length; i++) {
+            var ev = sorted[i];
+            if (ev.timestamp > toTime) break;
+
+            var hrs = Math.max(0, (ev.timestamp - prevTs) / 3600000);
+            idx = recoverIndex(idx, hrs);
+            idx = Math.max(MIN_INDEX, Math.min(MAX_INDEX, idx + ev.impact));
+            prevTs = ev.timestamp;
+        }
+
+        // Recovery from last processed point to toTime
+        if (toTime > prevTs) {
+            var hrsRemaining = Math.max(0, (toTime - prevTs) / 3600000);
+            idx = recoverIndex(idx, hrsRemaining);
+        }
+
+        return Math.max(MIN_INDEX, Math.min(MAX_INDEX, idx));
+    }
+
+    // Get index at each day boundary for chart
+    function getDailyIndexHistory(events, trackingStart, now) {
+        var DAY = 86400000;
+        var result = [];
+
+        // Go back CHART_DAYS from now
+        var startDate = new Date(now);
+        startDate.setHours(0, 0, 0, 0);
+        startDate = new Date(startDate.getTime() - (CHART_DAYS - 1) * DAY);
+
+        for (var d = 0; d < CHART_DAYS; d++) {
+            var dayStart = new Date(startDate.getTime() + d * DAY);
+            var dayEnd   = new Date(dayStart.getTime() + DAY);
+            var dayTs = Math.min(dayEnd.getTime(), now);
+
+            var idx = calculateCurrentIndex(events, trackingStart, dayTs);
+
+            // Count events on this day for severity
+            var dayEvents = (events || []).filter(function(ev) {
+                return ev.timestamp >= dayStart.getTime() && ev.timestamp < dayEnd.getTime();
+            });
+            var hasCritical = dayEvents.some(function(ev) { return ev.severity === "critical"; });
+            var hasWarning  = dayEvents.some(function(ev) { return ev.severity === "warning"; });
+            var hasInfo     = dayEvents.some(function(ev) { return ev.severity === "info"; });
+
+            var dateLabel = String(dayStart.getMonth() + 1).padStart(2, "0") + "-"
+                          + String(dayStart.getDate()).padStart(2, "0");
+
+            result.push({
+                date: dateLabel,
+                score: idx,
+                dayIndex: d,
+                eventCount: dayEvents.length,
+                hasCritical: hasCritical,
+                hasWarning: hasWarning,
+                hasInfo: hasInfo,
+                dayTs: dayTs
+            });
+        }
+
+        return result;
+    }
+
+    // ==================== Render ====================
+    var canvas, ctx, tooltip, wrapper;
+    var stabilityData = [];
+    var _allEvents = [];
+
+    function getCSSVar(name, fallback) {
+        var v = getComputedStyle(document.body).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    }
+
+    function resizeCanvas() {
+        var rect = wrapper.getBoundingClientRect();
+        var dpr = window.devicePixelRatio || 1;
+        canvas.width = rect.width * dpr;
+        canvas.height = 300 * dpr;
+        canvas.style.width = rect.width + "px";
+        canvas.style.height = "300px";
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
+        drawChart(rect.width, 300);
+    }
+
+    function drawChart(w, h) {
+        var pad = { top: 30, right: 30, bottom: 45, left: 45 };
+        var plotW = w - pad.left - pad.right;
+        var plotH = h - pad.top - pad.bottom;
+        var n = stabilityData.length;
+        if (n === 0) return;
+
+        ctx.clearRect(0, 0, w, h);
+        var borderColor = getCSSVar("--border", "#D8D8D8");
+        var mutedColor  = getCSSVar("--muted", "#555");
+        var accentColor = getCSSVar("--accent", "#0078D4");
+
+        // Y-axis grid
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = 0.5;
+        ctx.fillStyle = mutedColor;
+        ctx.font = "11px Arial, sans-serif";
+        ctx.textAlign = "right";
+        for (var yVal = 1; yVal <= 10; yVal++) {
+            var y = pad.top + plotH - (yVal / 10) * plotH;
+            ctx.beginPath();
+            ctx.moveTo(pad.left, y);
+            ctx.lineTo(w - pad.right, y);
+            ctx.stroke();
+            ctx.fillText(yVal, pad.left - 8, y + 4);
+        }
+
+        // Reference line at 7
+        ctx.strokeStyle = "rgba(249,168,37,0.4)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([6, 4]);
+        var y7 = pad.top + plotH - (7 / 10) * plotH;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y7);
+        ctx.lineTo(w - pad.right, y7);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // X-axis labels
+        ctx.fillStyle = mutedColor;
+        ctx.textAlign = "center";
+        var labelStep = n <= 7 ? 1 : n <= 14 ? 2 : 3;
+        for (var i = 0; i < n; i += labelStep) {
+            var x = pad.left + (i / (n - 1)) * plotW;
+            ctx.fillText(stabilityData[i].date, x, pad.top + plotH + 18);
+        }
+        // Always show last label
+        if ((n - 1) % labelStep !== 0) {
+            var lx = pad.left + plotW;
+            ctx.fillText(stabilityData[n - 1].date, lx, pad.top + plotH + 18);
+        }
+
+        // Shade area
+        ctx.beginPath();
+        var firstX = pad.left;
+        var firstY = pad.top + plotH - (stabilityData[0].score / 10) * plotH;
+        ctx.moveTo(firstX, pad.top + plotH);
+        ctx.lineTo(firstX, firstY);
+        for (var j = 1; j < n; j++) {
+            var xi = pad.left + (j / (n - 1)) * plotW;
+            var yi = pad.top + plotH - (stabilityData[j].score / 10) * plotH;
+            ctx.lineTo(xi, yi);
+        }
+        ctx.lineTo(pad.left + plotW, pad.top + plotH);
+        ctx.closePath();
+        var shadeGrad = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
+        shadeGrad.addColorStop(0, accentColor + "30");
+        shadeGrad.addColorStop(1, accentColor + "05");
+        ctx.fillStyle = shadeGrad;
+        ctx.fill();
+
+        // Line
+        ctx.beginPath();
+        ctx.moveTo(firstX, firstY);
+        for (var k = 1; k < n; k++) {
+            var xk = pad.left + (k / (n - 1)) * plotW;
+            var yk = pad.top + plotH - (stabilityData[k].score / 10) * plotH;
+            ctx.lineTo(xk, yk);
+        }
+        ctx.strokeStyle = accentColor;
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = "round";
+        ctx.stroke();
+
+        // Data points
+        for (var m = 0; m < n; m++) {
+            var px = pad.left + (m / (n - 1)) * plotW;
+            var py = pad.top + plotH - (stabilityData[m].score / 10) * plotH;
+            var sd = stabilityData[m];
+
+            if (sd.hasCritical) {
+                ctx.beginPath();
+                ctx.arc(px, py, 9, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(231,72,86,0.2)";
+                ctx.fill();
+                ctx.strokeStyle = "#E74856";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            } else if (sd.hasWarning) {
+                ctx.beginPath();
+                ctx.arc(px, py, 8, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(249,168,37,0.2)";
+                ctx.fill();
+                ctx.strokeStyle = "#F9A825";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            ctx.beginPath();
+            ctx.arc(px, py, 4.5, 0, Math.PI * 2);
+            ctx.fillStyle = accentColor;
+            ctx.fill();
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        }
+    }
+
+    // Chart tooltip
+    function setupTooltip() {
+        canvas.addEventListener("mousemove", function(e) {
+            var rect = canvas.getBoundingClientRect();
+            var w = rect.width;
+            var pad = { top: 30, right: 30, bottom: 45, left: 45 };
+            var plotW = w - pad.left - pad.right;
+            var n = stabilityData.length;
+            if (n === 0) return;
+
+            var mx = e.clientX - rect.left;
+            var my = e.clientY - rect.top;
+
+            var closest = -1, minDist = Infinity;
+            for (var i = 0; i < n; i++) {
+                var px = pad.left + (i / (n - 1)) * plotW;
+                var py = pad.top + (300 - pad.top - pad.bottom) - (stabilityData[i].score / 10) * (300 - pad.top - pad.bottom);
+                var dist = Math.sqrt((mx - px) * (mx - px) + (my - py) * (my - py));
+                if (dist < minDist) { minDist = dist; closest = i; }
+            }
+
+            if (minDist < 30 && closest >= 0) {
+                var d = stabilityData[closest];
+                var px = pad.left + (closest / (n - 1)) * plotW;
+                var statusText = d.score >= 8 ? "✅ 稳定" : d.score >= 6 ? "⚠️ 一般" : "❌ 不稳定";
+                var eventLine = d.eventCount > 0
+                    ? '<div class="tt-events">' + d.eventCount + ' 个事件</div>'
+                    : '<div class="tt-events">无特殊事件</div>';
+
+                tooltip.innerHTML = '<div class="tt-date">' + d.date + " " + statusText + '</div>'
+                    + '<div class="tt-score">指数：<b>' + d.score.toFixed(1) + '</b> / 10</div>'
+                    + eventLine;
+
+                var ttW = tooltip.offsetWidth;
+                var left = px - ttW / 2;
+                if (left < 0) left = 4;
+                if (left + ttW > w) left = w - ttW - 4;
+                tooltip.style.left = left + "px";
+                tooltip.style.top = "4px";
+                tooltip.style.display = "block";
+            } else {
+                tooltip.style.display = "none";
+            }
+        });
+        canvas.addEventListener("mouseleave", function() {
+            tooltip.style.display = "none";
+        });
+    }
+
+    // Event list
+    function buildEventList(events) {
+        var container = document.getElementById("eventList");
+        if (!events || events.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="empty-icon">🖱️</div><p>暂无事件记录。点击上方按钮记录第一个问题。</p></div>';
+            return;
+        }
+
+        // Group by date, reverse chronological
+        var sorted = events.slice().sort(function(a, b) { return b.timestamp - a.timestamp; });
+        var groups = {};
+        sorted.forEach(function(ev) {
+            var d = new Date(ev.timestamp);
+            var key = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(ev);
+        });
+
+        var html = "";
+        Object.keys(groups).forEach(function(dateStr) {
+            var parts = dateStr.split("-");
+            var label = parts[0] + "年" + parseInt(parts[1]) + "月" + parseInt(parts[2]) + "日";
+            html += '<div class="event-day-group"><div class="event-day-label">' + label + '</div>';
+            groups[dateStr].forEach(function(ev) {
+                var iconClass = ev.severity;
+                var iconSymbol = ev.severity === "critical" ? "✕" : ev.severity === "warning" ? "!" : "i";
+                var timeStr = String(new Date(ev.timestamp).getHours()).padStart(2, "0") + ":"
+                            + String(new Date(ev.timestamp).getMinutes()).padStart(2, "0");
+                html += '<div class="event-item" data-id="' + ev.id + '">';
+                html += '<div class="event-icon ' + iconClass + '">' + iconSymbol + '</div>';
+                html += '<div class="event-details">';
+                html += '<div class="event-title">' + ev.title + ' <span style="color:var(--muted);font-weight:normal;font-size:0.78rem">(' + (ev.impact >= 0 ? "+" : "") + ev.impact.toFixed(1) + ')</span></div>';
+                html += '<div class="event-desc">' + (ev.note || "") + '</div>';
+                html += '</div>';
+                html += '<div class="event-time">' + timeStr + '</div>';
+                html += '<button class="event-delete" data-id="' + ev.id + '" title="删除此记录">✕</button>';
+                html += '</div>';
+            });
+            html += '</div>';
+        });
+        container.innerHTML = html;
+
+        // Delete handlers
+        container.querySelectorAll(".event-delete").forEach(function(btn) {
+            btn.addEventListener("click", function(e) {
+                e.stopPropagation();
+                var evId = this.getAttribute("data-id");
+                deleteEvent(evId);
+            });
+        });
+    }
+
+    function deleteEvent(evId) {
+        var data = loadData();
+        if (!data) return;
+        data.events = data.events.filter(function(ev) { return ev.id !== evId; });
+        saveData(data);
+        refreshAll();
+        showToast("事件已删除，指数已重新计算");
+    }
+
+    // Stats
+    function updateStats(events, currentIndex) {
+        var idxEl = document.getElementById("currentIndex");
+        var tileEl = document.getElementById("tileIndex");
+        idxEl.textContent = currentIndex.toFixed(1);
+
+        tileEl.classList.remove("good", "warn", "bad");
+        if (currentIndex >= 8) tileEl.classList.add("good");
+        else if (currentIndex >= 6) tileEl.classList.add("warn");
+        else tileEl.classList.add("bad");
+
+        var total = events ? events.length : 0;
+        var critical = events ? events.filter(function(ev) { return ev.severity === "critical"; }).length : 0;
+        document.getElementById("totalEvents").textContent = total;
+        document.getElementById("criticalCount").textContent = critical;
+
+        // Days since last issue
+        var daysEl = document.getElementById("daysSinceIssue");
+        if (!events || events.length === 0) {
+            daysEl.textContent = "--";
+        } else {
+            var lastTs = events.reduce(function(max, ev) { return Math.max(max, ev.timestamp); }, 0);
+            var days = Math.floor((Date.now() - lastTs) / 86400000);
+            if (days === 0) {
+                var hrs = Math.floor((Date.now() - lastTs) / 3600000);
+                daysEl.textContent = hrs <= 1 ? "<1 小时" : hrs + " 小时";
+            } else {
+                daysEl.textContent = days + " 天";
+            }
+        }
+    }
+
+    // ==================== Modal ====================
+    var selectedIssueType = null;
+
+    function setupModal() {
+        var grid = document.getElementById("issueGrid");
+        var html = "";
+        ISSUE_TYPES.forEach(function(t) {
+            html += '<div class="issue-option" data-type="' + t.id + '">';
+            html += '<div class="io-icon ' + t.severity + '">' + t.icon + '</div>';
+            html += '<div>' + t.label + '</div>';
+            html += '<div class="io-impact">' + (t.impact >= 0 ? "+" : "") + t.impact.toFixed(1) + '</div>';
+            html += '</div>';
+        });
+        grid.innerHTML = html;
+
+        // Selection
+        grid.querySelectorAll(".issue-option").forEach(function(opt) {
+            opt.addEventListener("click", function() {
+                grid.querySelectorAll(".issue-option").forEach(function(o) { o.classList.remove("selected"); });
+                this.classList.add("selected");
+                selectedIssueType = this.getAttribute("data-type");
+                document.getElementById("btnSubmit").disabled = false;
+            });
+        });
+
+        // Buttons
+        document.getElementById("btnOpenModal").addEventListener("click", function() {
+            document.getElementById("modalOverlay").classList.add("active");
+            selectedIssueType = null;
+            grid.querySelectorAll(".issue-option").forEach(function(o) { o.classList.remove("selected"); });
+            document.getElementById("issueNote").value = "";
+            document.getElementById("btnSubmit").disabled = true;
+        });
+
+        document.getElementById("btnCancel").addEventListener("click", function() {
+            document.getElementById("modalOverlay").classList.remove("active");
+        });
+
+        document.getElementById("modalOverlay").addEventListener("click", function(e) {
+            if (e.target === this) this.classList.remove("active");
+        });
+
+        document.getElementById("btnSubmit").addEventListener("click", function() {
+            if (!selectedIssueType) return;
+            var note = document.getElementById("issueNote").value.trim();
+            reportIssue(selectedIssueType, note);
+            document.getElementById("modalOverlay").classList.remove("active");
+        });
+
+        // ESC to close
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "Escape") document.getElementById("modalOverlay").classList.remove("active");
+        });
+    }
+
+    function reportIssue(typeId, note) {
+        var t = issueTypeMap[typeId];
+        if (!t) return;
+
+        var data = loadData();
+        if (!data) {
+            // Shouldn't happen, but recover
+            data = seedData();
+        }
+
+        var now = Date.now();
+        var ev = {
+            id: "ev_" + now + "_" + Math.random().toString(36).slice(2, 7),
+            timestamp: now,
+            typeId: typeId,
+            title: t.label,
+            impact: t.impact,
+            severity: t.severity,
+            note: note || t.desc,
+            isSeed: false
+        };
+
+        data.events.push(ev);
+        saveData(data);
+        refreshAll();
+        showToast("已记录：「" + t.label + "」 指数 " + (t.impact >= 0 ? "+" : "") + t.impact.toFixed(1));
+    }
+
+    // ==================== Toast ====================
+    var toastTimer;
+
+    function showToast(msg) {
+        var el = document.getElementById("toast");
+        el.textContent = msg;
+        el.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function() { el.classList.remove("show"); }, 2500);
+    }
+
+    // ==================== Main ====================
+    function refreshAll() {
+        var data = loadData();
+        var now = Date.now();
+
+        if (!data) {
+            data = seedData();
+            saveData(data);
+        }
+
+        // fromTime = the baseline for recovery calculation.
+        // Use the earliest event timestamp, or CHART_DAYS ago if no events.
+        var earliestEv = data.events.length > 0
+            ? data.events.reduce(function(min, ev) { return Math.min(min, ev.timestamp); }, Date.now())
+            : now;
+        var fromTime = Math.min(earliestEv, now - CHART_DAYS * 86400000);
+
+        // Calculate current index
+        var currentIdx = calculateCurrentIndex(data.events, fromTime, now);
+
+        stabilityData = getDailyIndexHistory(data.events, fromTime, now);
+        _allEvents = data.events;
+
+        // Update last page-open time (for stats display only)
+        data.lastUpdate = now;
+        saveData(data);
+
+        // Render
+        updateStats(data.events, currentIdx);
+        resizeCanvas();
+        buildEventList(data.events);
+    }
+
+    // ==================== Init ====================
+    window.addEventListener("load", function() {
+        canvas = document.getElementById("stabilityChart");
+        ctx = canvas.getContext("2d");
+        tooltip = document.getElementById("chartTooltip");
+        wrapper = document.getElementById("chartWrapper");
+
+        setupTooltip();
+        setupModal();
+        refreshAll();
+
+        // Live update: recalculate index every 30s (recovery while page is open)
+        setInterval(function() {
+            var data = loadData();
+            if (!data) return;
+            var now = Date.now();
+            var earliestEv = data.events.length > 0
+                ? data.events.reduce(function(min, ev) { return Math.min(min, ev.timestamp); }, Date.now())
+                : now;
+            var fromTime = Math.min(earliestEv, now - CHART_DAYS * 86400000);
+
+            var currentIdx = calculateCurrentIndex(data.events, fromTime, now);
+            updateStats(data.events, currentIdx);
+
+            stabilityData = getDailyIndexHistory(data.events, fromTime, now);
+            resizeCanvas();
+        }, LIVE_UPDATE_MS);
+    });
+
+    window.addEventListener("resize", function() {
+        if (stabilityData.length > 0) resizeCanvas();
+    });
+
+    // Redraw on theme toggle
+    var themeBtn = document.getElementById("theme-toggle");
+    if (themeBtn) {
+        themeBtn.addEventListener("click", function() {
+            setTimeout(function() { if (stabilityData.length > 0) resizeCanvas(); }, 300);
+        });
+    }
+})();
+        </script>
+        <script src="/script.js" async></script>
+    </body>
+</html>
