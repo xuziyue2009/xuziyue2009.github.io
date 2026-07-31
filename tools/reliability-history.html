@@ -319,7 +319,6 @@
     function seedData() {
         var now = Date.now();
         var HOUR = 3600000;
-        var DAY = 24 * HOUR;
         var events = [];
         var evId = 0;
 
@@ -441,7 +440,14 @@
     // ==================== Render ====================
     var canvas, ctx, tooltip, wrapper;
     var stabilityData = [];
-    var _allEvents = [];
+
+    // Helper: compute the baseline timestamp for recovery calculation
+    function getFromTime(events, now) {
+        var earliestEv = events && events.length > 0
+            ? events.reduce(function(min, ev) { return Math.min(min, ev.timestamp); }, now)
+            : now;
+        return Math.min(earliestEv, now - CHART_DAYS * 86400000);
+    }
 
     function getCSSVar(name, fallback) {
         var v = getComputedStyle(document.body).getPropertyValue(name);
@@ -450,14 +456,16 @@
 
     function resizeCanvas() {
         var rect = wrapper.getBoundingClientRect();
+        var w = rect.width;
+        var h = rect.height || 300;  // dynamic: respects CSS media query (220px on mobile)
         var dpr = window.devicePixelRatio || 1;
-        canvas.width = rect.width * dpr;
-        canvas.height = 300 * dpr;
-        canvas.style.width = rect.width + "px";
-        canvas.style.height = "300px";
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = w + "px";
+        canvas.style.height = h + "px";
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.scale(dpr, dpr);
-        drawChart(rect.width, 300);
+        drawChart(w, h);
     }
 
     function drawChart(w, h) {
@@ -583,8 +591,10 @@
         canvas.addEventListener("mousemove", function(e) {
             var rect = canvas.getBoundingClientRect();
             var w = rect.width;
+            var h = rect.height;
             var pad = { top: 30, right: 30, bottom: 45, left: 45 };
             var plotW = w - pad.left - pad.right;
+            var plotH = h - pad.top - pad.bottom;
             var n = stabilityData.length;
             if (n === 0) return;
 
@@ -594,7 +604,7 @@
             var closest = -1, minDist = Infinity;
             for (var i = 0; i < n; i++) {
                 var px = pad.left + (i / (n - 1)) * plotW;
-                var py = pad.top + (300 - pad.top - pad.bottom) - (stabilityData[i].score / 10) * (300 - pad.top - pad.bottom);
+                var py = pad.top + plotH - (stabilityData[i].score / 10) * plotH;
                 var dist = Math.sqrt((mx - px) * (mx - px) + (my - py) * (my - py));
                 if (dist < minDist) { minDist = dist; closest = i; }
             }
@@ -682,10 +692,13 @@
     function deleteEvent(evId) {
         var data = loadData();
         if (!data) return;
+        var ev = data.events.find(function(e) { return e.id === evId; });
+        var label = ev ? ev.title : "此事件";
+        if (!confirm("确定要删除 「" + label + "」 吗？\n删除后指数将重新计算且无法恢复。")) return;
         data.events = data.events.filter(function(ev) { return ev.id !== evId; });
         saveData(data);
         refreshAll();
-        showToast("事件已删除，指数已重新计算");
+        showToast("已删除「" + label + "」，指数已重新计算");
     }
 
     // Stats
@@ -824,20 +837,13 @@
             saveData(data);
         }
 
-        // fromTime = the baseline for recovery calculation.
-        // Use the earliest event timestamp, or CHART_DAYS ago if no events.
-        var earliestEv = data.events.length > 0
-            ? data.events.reduce(function(min, ev) { return Math.min(min, ev.timestamp); }, Date.now())
-            : now;
-        var fromTime = Math.min(earliestEv, now - CHART_DAYS * 86400000);
+        var fromTime = getFromTime(data.events, now);
 
         // Calculate current index
         var currentIdx = calculateCurrentIndex(data.events, fromTime, now);
-
         stabilityData = getDailyIndexHistory(data.events, fromTime, now);
-        _allEvents = data.events;
 
-        // Update last page-open time (for stats display only)
+        // Update last page-open time
         data.lastUpdate = now;
         saveData(data);
 
@@ -863,10 +869,7 @@
             var data = loadData();
             if (!data) return;
             var now = Date.now();
-            var earliestEv = data.events.length > 0
-                ? data.events.reduce(function(min, ev) { return Math.min(min, ev.timestamp); }, Date.now())
-                : now;
-            var fromTime = Math.min(earliestEv, now - CHART_DAYS * 86400000);
+            var fromTime = getFromTime(data.events, now);
 
             var currentIdx = calculateCurrentIndex(data.events, fromTime, now);
             updateStats(data.events, currentIdx);
