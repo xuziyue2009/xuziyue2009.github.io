@@ -1,310 +1,267 @@
-const SEARCH_INDEX_PATH = '/searchIndex.json';
-const THEME_STORAGE_KEY = 'xzy-site-theme';
+/**
+ * script.js — Global behaviours for xzy's website
+ * Clock, theme toggle, client-side search.
+ * Load AFTER components.js so #search / #theme-toggle / #date / #time exist.
+ */
+(function () {
+    'use strict';
 
-function updateClock() {
-    var now = new Date();
-    var hour = now.getHours();
-    var minute = now.getMinutes();
-    var second = now.getSeconds();
-    var year = now.getFullYear();
-    var month = now.getMonth() + 1;
-    var date = now.getDate();
-    var day = now.getDay();
+    var SEARCH_INDEX_PATH = '/searchIndex.json';
+    var THEME_STORAGE_KEY = 'xzy-site-theme';
 
-    hour = (hour < 10 ? '0' : '') + hour;
-    minute = (minute < 10 ? '0' : '') + minute;
-    second = (second < 10 ? '0' : '') + second;
+    /* ================================================================
+     * Clock
+     * ================================================================ */
 
-    switch (day) {
-        case 1:
-            day = '星期一';
-            break;
-        case 2:
-            day = '星期二';
-            break;
-        case 3:
-            day = '星期三';
-            break;
-        case 4:
-            day = '星期四';
-            break;
-        case 5:
-            day = '星期五';
-            break;
-        case 6:
-            day = '星期六';
-            break;
-        case 0:
-            day = '星期日';
-            break;
-        default:
-            day = '-';
+    var DAYS = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+
+    function updateClock() {
+        var now  = new Date();
+        var hh   = pad(now.getHours());
+        var mm   = pad(now.getMinutes());
+        var ss   = pad(now.getSeconds());
+        var date = now.getFullYear() + '/' + (now.getMonth() + 1) + '/' + now.getDate();
+        var day  = DAYS[now.getDay()] || '-';
+
+        setText('date', date + ' ' + day);
+        setText('time', hh + ':' + mm + ':' + ss);
+
+        setTimeout(updateClock, 1000);
     }
 
-    var time = hour + ':' + minute + ':' + second;
-    var fulldate = year + '/' + month + '/' + date + ' ' + day;
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
 
-    var dateEl = document.getElementById('date');
-    var timeEl = document.getElementById('time');
-
-    if (dateEl) dateEl.innerHTML = fulldate;
-    if (timeEl) timeEl.innerHTML = time;
-
-    setTimeout(updateClock, 1000);
-}
-
-function initializeTheme() {
-    var savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark');
-    } else if (savedTheme === 'light') {
-        document.body.classList.remove('dark');
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.body.classList.add('dark');
-    }
-}
-
-function setTheme(isDark) {
-    if (isDark) {
-        document.body.classList.add('dark');
-        localStorage.setItem(THEME_STORAGE_KEY, 'dark');
-    } else {
-        document.body.classList.remove('dark');
-        localStorage.setItem(THEME_STORAGE_KEY, 'light');
-    }
-}
-
-function loadSearchIndex(callback) {
-    if (window.siteSearchIndex) {
-        callback && callback(window.siteSearchIndex);
-        return;
+    function setText(id, text) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = text;
     }
 
-    fetch(SEARCH_INDEX_PATH)
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(data) {
-            window.siteSearchIndex = data;
-            callback && callback(data);
-        })
-        .catch(function(error) {
-            console.error('Failed to load search index:', error);
-            callback && callback([]);
-        });
-}
+    /* ================================================================
+     * Theme
+     * ================================================================ */
 
-function getQueryParam(name) {
-    var params = new URLSearchParams(window.location.search);
-    return params.get(name) || '';
-}
-
-function isSearchPage() {
-    return window.location.pathname.endsWith('/search.html') || window.location.pathname === '/search' || window.location.pathname === '/search/';
-}
-
-function searchSite(query) {
-    var trimmed = query.trim();
-    if (!trimmed) {
-        if (isSearchPage()) {
-            renderSearchResults([], trimmed);
+    function initializeTheme() {
+        var saved = localStorage.getItem(THEME_STORAGE_KEY);
+        if (saved === 'dark') {
+            document.body.classList.add('dark');
+        } else if (saved === 'light') {
+            document.body.classList.remove('dark');
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark');
         }
-        return;
     }
 
-    if (window.siteSearchIndex) {
-        window.location.href = '/search.html?q=' + encodeURIComponent(trimmed);
-    } else {
-        loadSearchIndex(function() {
-            window.location.href = '/search.html?q=' + encodeURIComponent(trimmed);
+    function setTheme(isDark) {
+        if (isDark) {
+            document.body.classList.add('dark');
+            localStorage.setItem(THEME_STORAGE_KEY, 'dark');
+        } else {
+            document.body.classList.remove('dark');
+            localStorage.setItem(THEME_STORAGE_KEY, 'light');
+        }
+    }
+
+    function setupThemeToggle() {
+        var btn = document.getElementById('theme-toggle');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+            setTheme(!document.body.classList.contains('dark'));
         });
     }
-}
 
-function normalize(text) {
-    return (text || '').toLowerCase();
-}
+    /* ================================================================
+     * Search
+     * ================================================================ */
 
-function escapeHTML(text) {
-    return String(text)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
-function escapeRegExp(value) {
-    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function highlightText(text, terms) {
-    if (!text || !terms.length) {
-        return escapeHTML(text);
-    }
-
-    var escaped = escapeHTML(text);
-    var pattern = new RegExp('(' + terms.map(escapeRegExp).join('|') + ')', 'gi');
-    return escaped.replace(pattern, '<span class="highlight">$1</span>');
-}
-
-function scoreMatch(item, terms) {
-    var title = normalize(item.title || '');
-    var description = normalize(item.description || '');
-    var tags = normalize((item.tags || []).join(' '));
-    var url = normalize(item.url || '');
-    var score = 0;
-
-    terms.forEach(function(term) {
-        if (title === term) {
-            score += 120;
-        } else if (title.indexOf(term) === 0) {
-            score += 60;
-        } else if (title.indexOf(term) !== -1) {
-            score += 40;
+    function loadSearchIndex(cb) {
+        if (window.__siteSearchIndex) {
+            cb && cb(window.__siteSearchIndex);
+            return;
         }
-
-        if (description.indexOf(term) !== -1) {
-            score += 20;
-        }
-
-        if (tags.indexOf(term) !== -1) {
-            score += 30;
-        }
-
-        if (url.indexOf(term) !== -1) {
-            score += 10;
-        }
-    });
-
-    return score;
-}
-
-function findMatches(query) {
-    var terms = normalize(query).split(/\s+/).filter(Boolean);
-    if (!terms.length || !window.siteSearchIndex) return [];
-
-    return window.siteSearchIndex
-        .map(function(item) {
-            var content = normalize(item.title + ' ' + item.description + ' ' + (item.tags || []).join(' '));
-            var matchesAll = terms.every(function(term) {
-                return content.indexOf(term) !== -1;
+        fetch(SEARCH_INDEX_PATH)
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                window.__siteSearchIndex = data;
+                cb && cb(data);
+            })
+            .catch(function (err) {
+                console.error('Failed to load search index:', err);
+                cb && cb([]);
             });
-            return matchesAll ? { item: item, score: scoreMatch(item, terms) } : null;
-        })
-        .filter(Boolean)
-        .sort(function(a, b) {
-            return b.score - a.score;
-        })
-        .map(function(entry) {
-            return entry.item;
-        });
-}
-
-function renderSearchResults(results, query) {
-    var container = document.getElementById('search-results');
-    if (!container) return;
-
-    container.innerHTML = '';
-
-    var info = document.createElement('div');
-    info.className = 'search-summary';
-
-    if (!query) {
-        info.textContent = '请输入关键词开始搜索。';
-        container.appendChild(info);
-        return;
     }
 
-    if (!results.length) {
-        info.textContent = '未找到匹配项："' + query + '"';
-        container.appendChild(info);
-
-        var suggestion = document.createElement('p');
-        suggestion.className = 'search-summary';
-        suggestion.textContent = '请尝试更宽泛的关键词，例如“工具”、“游戏”、“博客”等。';
-        container.appendChild(suggestion);
-        return;
+    function getQueryParam(name) {
+        return (new URLSearchParams(window.location.search)).get(name) || '';
     }
 
-    info.textContent = '找到 ' + results.length + ' 条结果："' + query + '"';
-    container.appendChild(info);
+    function isSearchPage() {
+        var p = window.location.pathname;
+        return /\/search\.html/.test(p) || p === '/search' || p === '/search/';
+    }
 
-    var terms = normalize(query).split(/\s+/).filter(Boolean);
+    function searchSite(query) {
+        var q = query.trim();
+        if (!q) {
+            if (isSearchPage()) renderSearchResults([], q);
+            return;
+        }
+        // Navigate to search page — index will load lazily there
+        window.location.href = '/search.html?q=' + encodeURIComponent(q);
+    }
 
-    results.forEach(function(item) {
-        var resultCard = document.createElement('div');
-        resultCard.className = 'card';
-        resultCard.style.marginTop = '0';
-
-        var title = document.createElement('h2');
-        var link = document.createElement('a');
-        link.href = item.url;
-        link.innerHTML = highlightText(item.title || '', terms);
-        title.appendChild(link);
-
-        var desc = document.createElement('p');
-        desc.innerHTML = highlightText(item.description || '', terms);
-
-        var path = document.createElement('p');
-        path.className = 'search-path';
-        path.textContent = item.url.replace(/^\//, '');
-
-        resultCard.appendChild(title);
-        resultCard.appendChild(desc);
-        resultCard.appendChild(path);
-        container.appendChild(resultCard);
-    });
-}
-
-function setupSearch() {
-    var searchInput = document.getElementById('search');
-    if (searchInput) {
-        searchInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.keyCode === 13) {
+    function setupSearch() {
+        var input = document.getElementById('search');
+        if (!input) return;
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
                 e.preventDefault();
-                searchSite(searchInput.value);
+                searchSite(input.value);
             }
         });
+
+        // Restore query on search page
+        var q = getQueryParam('q');
+        if (q && input) {
+            input.value = decodeURIComponent(q);
+        }
     }
 
-    var query = getQueryParam('q');
-    if (query && searchInput) {
-        searchInput.value = decodeURIComponent(query);
+    /* ---- scoring & rendering (only used on search page) ---- */
+
+    function normalize(s) { return (s || '').toLowerCase(); }
+
+    function escapeHTML(s) {
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
-}
 
-function setupThemeToggle() {
-    var themeButton = document.getElementById('theme-toggle');
-    if (!themeButton) return;
+    function escapeRegExp(v) { return v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-    themeButton.addEventListener('click', function() {
-        var useDark = !document.body.classList.contains('dark');
-        setTheme(useDark);
-    });
-}
+    function highlightText(text, terms) {
+        if (!text || !terms.length) return escapeHTML(text);
+        var esc = escapeHTML(text);
+        var re  = new RegExp('(' + terms.map(escapeRegExp).join('|') + ')', 'gi');
+        return esc.replace(re, '<span class="highlight">$1</span>');
+    }
 
-function initPage() {
-    initializeTheme();
-    setupSearch();
-    setupThemeToggle();
+    function scoreMatch(item, terms) {
+        var title = normalize(item.title || '');
+        var desc  = normalize(item.description || '');
+        var tags  = normalize((item.tags || []).join(' '));
+        var url   = normalize(item.url || '');
+        var score = 0;
 
-    var query = getQueryParam('q');
-    if (isSearchPage() && query) {
-        loadSearchIndex(function() {
-            renderSearchResults(findMatches(query), decodeURIComponent(query || ''));
+        terms.forEach(function (t) {
+            if (title === t)               score += 120;
+            else if (title.indexOf(t) === 0) score += 60;
+            else if (title.indexOf(t) !== -1) score += 40;
+            if (desc.indexOf(t) !== -1)     score += 20;
+            if (tags.indexOf(t) !== -1)     score += 30;
+            if (url.indexOf(t) !== -1)      score += 10;
+        });
+        return score;
+    }
+
+    function findMatches(query) {
+        var terms = normalize(query).split(/\s+/).filter(Boolean);
+        if (!terms.length || !window.__siteSearchIndex) return [];
+
+        return window.__siteSearchIndex
+            .map(function (item) {
+                var content = normalize(item.title + ' ' + item.description + ' ' + (item.tags || []).join(' '));
+                var ok = terms.every(function (t) { return content.indexOf(t) !== -1; });
+                return ok ? { item: item, score: scoreMatch(item, terms) } : null;
+            })
+            .filter(Boolean)
+            .sort(function (a, b) { return b.score - a.score; })
+            .map(function (e) { return e.item; });
+    }
+
+    function renderSearchResults(results, query) {
+        var container = document.getElementById('search-results');
+        if (!container) return;
+        container.innerHTML = '';
+
+        var info = document.createElement('div');
+        info.className = 'search-summary';
+
+        if (!query) {
+            info.textContent = '请输入关键词开始搜索。';
+            container.appendChild(info);
+            return;
+        }
+        if (!results.length) {
+            info.textContent = '未找到匹配项："' + query + '"';
+            container.appendChild(info);
+            var hint = document.createElement('p');
+            hint.className = 'search-summary';
+            hint.textContent = '请尝试更宽泛的关键词，例如"工具"、"游戏"、"博客"等。';
+            container.appendChild(hint);
+            return;
+        }
+
+        info.textContent = '找到 ' + results.length + ' 条结果："' + query + '"';
+        container.appendChild(info);
+
+        var terms = normalize(query).split(/\s+/).filter(Boolean);
+        results.forEach(function (item) {
+            var card  = document.createElement('div');
+            card.className = 'card';
+            card.style.marginTop = '0';
+
+            var title = document.createElement('h2');
+            var link  = document.createElement('a');
+            link.href = item.url;
+            link.innerHTML = highlightText(item.title || '', terms);
+            title.appendChild(link);
+
+            var desc = document.createElement('p');
+            desc.innerHTML = highlightText(item.description || '', terms);
+
+            var path = document.createElement('p');
+            path.className = 'search-path';
+            path.textContent = item.url.replace(/^\//, '');
+
+            card.appendChild(title);
+            card.appendChild(desc);
+            card.appendChild(path);
+            container.appendChild(card);
         });
     }
-}
 
-if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', initPage);
-} else {
-    initPage();
-}
+    /* ================================================================
+     * Bootstrap
+     * ================================================================ */
 
-if (document.readyState === 'complete') {
-    updateClock();
-} else {
-    window.addEventListener('load', updateClock);
-}
+    function initSite() {
+        initializeTheme();
+        setupSearch();
+        setupThemeToggle();
+
+        // If we're on the search page with a query, render results
+        var q = getQueryParam('q');
+        if (isSearchPage() && q) {
+            loadSearchIndex(function () {
+                renderSearchResults(findMatches(q), decodeURIComponent(q));
+            });
+        }
+    }
+
+    /* ---- wire up ---- */
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSite);
+    } else {
+        initSite();
+    }
+
+    if (document.readyState === 'complete') {
+        updateClock();
+    } else {
+        window.addEventListener('load', updateClock);
+    }
+})();

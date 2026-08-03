@@ -1,122 +1,82 @@
-var l = 5;  
-var randomNum;
-var points = 0;
-var output;
-var tip_output;
-const word = "Supercalifragilisticexpialidocious";  
-const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']; 
+'use strict';
 
-window.onload = function load(){
+const WORD = 'Supercalifragilisticexpialidocious';
+const LETTERS = 'abcdefghijklmnopqrstuvwxyz'.split('');
+let round = 5;
+let answerIndex;
+let score = 0;
+let hintText;
+
+function create() {
+    const variantsDiv = document.getElementById('variants');
+    variantsDiv.innerHTML = '';
+
+    answerIndex = Math.floor(Math.random() * round) + 1;
+    const changePos = Math.floor(Math.random() * WORD.length);
+    const changeChar = LETTERS[Math.floor(Math.random() * 26)];
+
+    for (let i = 1; i <= round; i++) {
+        let text = WORD;
+        if (i === answerIndex) {
+            text = WORD.substring(0, changePos) + changeChar + WORD.substring(changePos + 1);
+            hintText = `${text.substring(0, changePos)}<${changeChar}>${text.substring(changePos + 1)}`;
+        }
+
+        const num = String(i).padStart(2, '0') + '.';
+        const el = document.createElement('p');
+        el.textContent = num + text;
+        variantsDiv.appendChild(el);
+    }
+
+    round++;
+
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.id = 'numberInput';
+    input.placeholder = '请输入一个数字';
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') checkAnswer();
+    });
+    document.getElementById('inputans').appendChild(input);
+
+    const btn = document.createElement('button');
+    btn.textContent = '检查答案';
+    btn.addEventListener('click', checkAnswer);
+    document.getElementById('buttonDiv').appendChild(btn);
+}
+
+function checkAnswer() {
+    const raw = document.getElementById('numberInput').value;
+    if (!/^\d+$/.test(raw)) {
+        alert('请输入数字！');
+        return;
+    }
+
+    const num = parseInt(raw, 10);
+    if (num === 2236) alert('???');
+
+    if (num === answerIndex) {
+        alert(`对\n${hintText}`);
+        score++;
+    } else {
+        alert(`错\n${hintText}`);
+        score--;
+        round--;
+    }
+
+    refreshScore();
+    ['variants', 'inputans', 'buttonDiv'].forEach(id => {
+        document.getElementById(id).innerHTML = '';
+    });
     create();
 }
-  
-function create() {  
-    var variantsDiv = document.getElementById('variants'); // 获取容纳变体的 div 元素
-    variantsDiv.innerHTML = ''; // 清空 div 的内容，以便添加新的变体
-  
-    randomNum = Math.floor(Math.random() * l) + 1;  
-    var randomPlace = Math.floor(Math.random() * word.length); // 注意这里使用 word.length 而不是硬编码的 34  
-    var randomLetter = Math.floor(Math.random() * 26);  
 
-    console.log(randomNum);
-  
-    for (var i = 1; i <= l; i++) {  
-        output = word;  
-        if (i === randomNum) {  
-            output = output.substring(0, randomPlace) + letters[randomLetter] + output.substring(randomPlace + 1);  
-            tip_output = output.substring(0, randomPlace) + "<" + letters[randomLetter] + ">" + output.substring(randomPlace + 1);
-        }  
-
-        p_i = i;
-        if (p_i < 10){
-            p_i = "0" + p_i.toString();
-        }
-        p_i = p_i.toString() + ".";
-  
-        // 创建新的 p 元素  
-        var pElement = document.createElement('p');
-        // 设置 p 元素的内容
-        pElement.textContent = p_i + output;
-        // 将 p 元素添加到 div 中
-        variantsDiv.appendChild(pElement);
-    }  
-  
-    l += 1;  
-
-    var input = document.createElement('input'); // 创建一个新的<input>元素
-    input.type = 'number'; // 设置类型为number
-    input.id = 'numberInput'; // 设置id为numberInput
-    input.placeholder = '请输入一个数字'; // 设置占位符
-    input.onkeydown = enterPressed; // 设置回车检查
-
-    var inputDiv = document.getElementById('inputans');
-    inputDiv.appendChild(input);
-
-    // 添加按钮
-    var checkButton = document.createElement('button');
-    checkButton.textContent = '检查答案'; // 设置按钮文本
-    checkButton.onclick = checkNumber; // 设置按钮点击事件处理程序
-  
-    // 获取包含按钮的 div 元素  
-    var buttonDiv = document.getElementById('buttonDiv');  
-  
-    // 将按钮添加到 div 中  
-    buttonDiv.appendChild(checkButton); 
+function refreshScore() {
+    const el = document.getElementById('points');
+    el.innerHTML = '';
+    const p = document.createElement('p');
+    p.textContent = `分数：${score}`;
+    el.appendChild(p);
 }
 
-function checkNumber() {  
-    var inputValue = document.getElementById("numberInput").value;  
-    var isNumber = /^\d+$/.test(inputValue);  
-
-    if (!isNumber) {  
-        alert("请输入数字！");  
-        return;  
-    }  
-
-    var number = parseInt(inputValue);  
-
-    if (number == 2236){
-        alert("???");
-    }
-
-    var isAns = number === randomNum;  
-
-    if (isAns) {  
-        alert("对\n" + tip_output);  
-        points += 1;  
-    }
-    else{
-        alert("错\n" + tip_output);
-        points -= 1;
-        l -= 1;
-    }
-    pointsfresh();
-
-    var variantsDiv = document.getElementById('variants'); // 获取容纳变体的 div 元素  
-    variantsDiv.innerHTML = ''; // 清空 div 的内容，以便添加新的变体  
-    variantsDiv = document.getElementById('inputans'); // 获取容纳变体的 div 元素  
-    variantsDiv.innerHTML = ''; // 清空 div 的内容，以便添加新的变体  
-    variantsDiv = document.getElementById('buttonDiv'); // 获取容纳变体的 div 元素  
-    variantsDiv.innerHTML = ''; // 清空 div 的内容，以便添加新的变体  
-
-    create()
-}
-
-function pointsfresh(){
-    var pointsdiv = document.getElementById('points');  
-    // 清空 points div 的内容  
-    pointsdiv.innerHTML = '';  
-      
-    // 创建一个新的<p>元素来显示分数  
-    var pointsoutput = document.createElement('p');  
-    pointsoutput.textContent = "分数：" + points;  
-      
-    // 将<p>元素添加到'points' div中  
-    pointsdiv.appendChild(pointsoutput);
-}
-
-function enterPressed(event) {  
-    if (event.key === "Enter") {  
-        checkNumber();  
-    }  
-}  
+window.addEventListener('load', create);

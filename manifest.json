@@ -1,0 +1,17 @@
+{
+    "name": "xzy的网站",
+    "short_name": "xzy",
+    "description": "xzy的个人网站，有一些简单的小游戏、小工具和博客文章。",
+    "start_url": "/",
+    "display": "standalone",
+    "theme_color": "#0078D4",
+    "background_color": "#F0F8FF",
+    "icons": [
+        {
+            "src": "/media/logo.png",
+            "sizes": "40x40",
+            "type": "image/png"
+        }
+    ],
+    "lang": "zh-CN"
+}

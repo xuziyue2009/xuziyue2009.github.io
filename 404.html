@@ -1,35 +1,31 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>404 - xzy的网站</title>
-        <link rel="shortcut icon" href="/favicon.ico">
-        <link rel="stylesheet" type="text/css" href="/style.css">
-        <meta name="description" content="页面未找到，返回 xzy 个人网站首页。">
-        <meta http-equiv="content-language" content="zh-cn">
-    </head>
-    <body>
-        <div class="topnav">
-            <a href="/">首页</a>
-            <a href="/tools/index.html">工具</a>
-            <a href="/games/index.html">游戏</a>
-            <a href="/blogs/index.html">博客</a>
-            <a href="/files/index.html">文件</a>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>404 - xzy的网站</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/style.css">
+    <meta name="description" content="页面未找到，返回 xzy 个人网站首页。">
+    <meta property="og:title" content="404 - xzy的网站">
+    <meta property="og:description" content="页面未找到">
+    <meta property="og:type" content="website">
+</head>
+<body>
+    <div id="site-nav"></div>
+    <div id="site-header"></div>
+
+    <div class="row">
+        <div class="fullcolumn">
+            <div class="card" style="text-align:center">
+                <p>"小网站到哪里去了"</p>
+                <a href="/">返回主页</a>
+            </div>
         </div>
-        <div class="header">
-            <img src="/media/logo.png" alt="logo" width="40px" height="40px" loading="lazy">
-            <h1>404 not found</h1>
-            <input type="text" id="search" placeholder="搜索本站内容...">
-            <button id="theme-toggle">切换主题</button>
-            <div id="date">now_date</div>
-            <div id="time">now_time</div>
-            <p>"小网站到哪里去了"</p>
-            <a href="/">返回主页</a>
-        </div>
-        <div class="footer">
-            -xzy的网站-
-        </div>
-        <script src="/script.js" async></script>
-    </body>
+    </div>
+
+    <div id="site-footer"></div>
+    <script src="/components.js"></script>
+    <script src="/script.js"></script>
+</body>
 </html>

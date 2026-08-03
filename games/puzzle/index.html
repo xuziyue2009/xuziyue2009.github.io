@@ -1,262 +1,40 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>拼图 - xzy的网站</title>
-        <link rel="shortcut icon" href="/favicon.ico">
-        <link rel="stylesheet" type="text/css" href="/style.css">
-        <meta name="description" content="拼图游戏页面，体验数字华容道。">
-        <meta http-equiv="content-language" content="zh-cn">
-        <style>
-            .puzzle-container {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-                padding: 20px;
-            }
-            .puzzle-board {
-                display: grid;
-                grid-template-columns: repeat(4, 80px);
-                grid-template-rows: repeat(4, 80px);
-                gap: 4px;
-                background: var(--border);
-                padding: 4px;
-                border-radius: 8px;
-                touch-action: manipulation;
-            }
-            .puzzle-tile {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: var(--accent);
-                color: #fff;
-                font-size: 1.6rem;
-                font-weight: bold;
-                border-radius: 6px;
-                cursor: pointer;
-                user-select: none;
-                transition: transform 0.12s ease, background 0.2s ease;
-            }
-            .puzzle-tile.empty {
-                background: transparent;
-                cursor: default;
-            }
-            .puzzle-tile:hover:not(.empty) {
-                background: var(--accent-hover);
-            }
-            .puzzle-controls {
-                display: flex;
-                gap: 12px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .puzzle-controls button {
-                padding: 10px 20px;
-                font-size: 1rem;
-            }
-            .puzzle-message {
-                font-size: 1.1rem;
-                color: var(--accent);
-                font-weight: bold;
-                min-height: 1.5em;
-            }
-            @media (max-width: 400px) {
-                .puzzle-board {
-                    grid-template-columns: repeat(4, 70px);
-                    grid-template-rows: repeat(4, 70px);
-                }
-                .puzzle-tile {
-                    font-size: 1.3rem;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="topnav">
-            <a href="/">首页</a>
-            <a href="/tools/index.html">工具</a>
-            <a href="/games/index.html">游戏</a>
-            <a href="/blogs/index.html">博客</a>
-            <a href="/files/index.html">文件</a>
-        </div>
-        <div class="header">
-            <img src="/media/logo.png" alt="logo" width="40px" height="40px" loading="lazy">
-            <h1>数字华容道</h1>
-            <input type="text" id="search" placeholder="搜索本站内容...">
-            <button id="theme-toggle">切换主题</button>
-            <div id="date">now_date</div>
-            <div id="time">now_time</div>
-        </div>
-        <div class="row">
-            <div class="fullcolumn">
-                <div class="card">
-                    <div class="puzzle-container">
-                        <p>点击数字方块移动到空位，按顺序排列 1-15 即可获胜。</p>
-                        <p>步数：<span id="move-count">0</span></p>
-                        <div class="puzzle-message" id="puzzle-msg"></div>
-                        <div class="puzzle-board" id="puzzle-board"></div>
-                        <div class="puzzle-controls">
-                            <button id="puzzle-shuffle">洗牌</button>
-                            <button id="puzzle-reset">重置</button>
-                        </div>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>数字华容道 - xzy的网站</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/style.css">
+    <meta name="description" content="拼图游戏页面，体验数字华容道。">
+    <meta property="og:title" content="数字华容道 - xzy的网站">
+    <meta property="og:description" content="经典数字拼图，滑动方块按顺序排列">
+    <meta property="og:type" content="website">
+</head>
+<body>
+    <div id="site-nav"></div>
+    <div id="site-header"></div>
+
+    <div class="row">
+        <div class="fullcolumn">
+            <div class="card">
+                <div class="puzzle-container">
+                    <p>点击数字方块移动到空位，按顺序排列 1-15 即可获胜。</p>
+                    <p>步数：<span id="move-count">0</span></p>
+                    <div class="puzzle-message" id="puzzle-msg"></div>
+                    <div class="puzzle-board" id="puzzle-board"></div>
+                    <div class="puzzle-controls">
+                        <button id="puzzle-shuffle">洗牌</button>
+                        <button id="puzzle-reset">重置</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="footer">
-            -xzy的网站-
-        </div>
-        <script>
-(function() {
-    var size = 4;
-    var board = [];
-    var moveCount = 0;
-    var emptyRow = size - 1;
-    var emptyCol = size - 1;
-    var gameOver = false;
+    </div>
 
-    var boardEl = document.getElementById('puzzle-board');
-    var moveCountEl = document.getElementById('move-count');
-    var msgEl = document.getElementById('puzzle-msg');
-
-    function initBoard() {
-        board = [];
-        for (var r = 0; r < size; r++) {
-            board[r] = [];
-            for (var c = 0; c < size; c++) {
-                var val = r * size + c + 1;
-                board[r][c] = val < size * size ? val : 0;
-            }
-        }
-        emptyRow = size - 1;
-        emptyCol = size - 1;
-        moveCount = 0;
-        gameOver = false;
-        msgEl.textContent = '';
-        updateMoveDisplay();
-    }
-
-    function updateMoveDisplay() {
-        moveCountEl.textContent = moveCount;
-    }
-
-    function render() {
-        boardEl.innerHTML = '';
-        for (var r = 0; r < size; r++) {
-            for (var c = 0; c < size; c++) {
-                var tile = document.createElement('div');
-                tile.className = 'puzzle-tile';
-                if (board[r][c] === 0) {
-                    tile.classList.add('empty');
-                } else {
-                    tile.textContent = board[r][c];
-                }
-                tile.dataset.row = r;
-                tile.dataset.col = c;
-                tile.addEventListener('click', tileClick);
-                boardEl.appendChild(tile);
-            }
-        }
-    }
-
-    function tileClick(e) {
-        if (gameOver) return;
-        var r = parseInt(e.currentTarget.dataset.row);
-        var c = parseInt(e.currentTarget.dataset.col);
-        if (board[r][c] === 0) return;
-
-        if (isAdjacent(r, c, emptyRow, emptyCol)) {
-            board[emptyRow][emptyCol] = board[r][c];
-            board[r][c] = 0;
-            emptyRow = r;
-            emptyCol = c;
-            moveCount++;
-            updateMoveDisplay();
-            render();
-            checkWin();
-        }
-    }
-
-    function isAdjacent(r1, c1, r2, c2) {
-        return (Math.abs(r1 - r2) + Math.abs(c1 - c2)) === 1;
-    }
-
-    function shuffle() {
-        initBoard();
-        var lastMove = -1;
-        for (var i = 0; i < 200; i++) {
-            var moves = getValidMoves();
-            var move;
-            do {
-                move = moves[Math.floor(Math.random() * moves.length)];
-            } while (moves.length > 1 && move === lastMove);
-            lastMove = move;
-            applyMove(move);
-        }
-        // If already solved after shuffle, make one more move
-        if (isSolved()) {
-            var extra = getValidMoves();
-            applyMove(extra[0]);
-        }
-        moveCount = 0;
-        gameOver = false;
-        msgEl.textContent = '';
-        updateMoveDisplay();
-        render();
-    }
-
-    function getValidMoves() {
-        var moves = [];
-        var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
-        for (var d = 0; d < dirs.length; d++) {
-            var nr = emptyRow + dirs[d][0];
-            var nc = emptyCol + dirs[d][1];
-            if (nr >= 0 && nr < size && nc >= 0 && nc < size) {
-                moves.push([nr, nc]);
-            }
-        }
-        return moves;
-    }
-
-    function applyMove(move) {
-        var r = move[0], c = move[1];
-        board[emptyRow][emptyCol] = board[r][c];
-        board[r][c] = 0;
-        emptyRow = r;
-        emptyCol = c;
-    }
-
-    function isSolved() {
-        for (var r = 0; r < size; r++) {
-            for (var c = 0; c < size; c++) {
-                var expected = r * size + c + 1;
-                if (expected < size * size && board[r][c] !== expected) return false;
-            }
-        }
-        return board[size-1][size-1] === 0;
-    }
-
-    function checkWin() {
-        if (isSolved()) {
-            gameOver = true;
-            msgEl.textContent = '🎉 恭喜！你用 ' + moveCount + ' 步完成了拼图！';
-        }
-    }
-
-    function reset() {
-        initBoard();
-        render();
-    }
-
-    document.getElementById('puzzle-shuffle').addEventListener('click', shuffle);
-    document.getElementById('puzzle-reset').addEventListener('click', reset);
-
-    initBoard();
-    render();
-})();
-        </script>
-        <script src="/script.js" async></script>
-    </body>
+    <div id="site-footer"></div>
+    <script src="script.js"></script>
+    <script src="/components.js"></script>
+    <script src="/script.js"></script>
+</body>
 </html>

@@ -1,43 +1,33 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>kirka准星 - xzy的网站</title>
-        <link rel="shortcut icon" href="/favicon.ico">
-        <link rel="stylesheet" type="text/css" href="/style.css">
-        <meta name="description" content="kirka 准星素材页面，展示准星与狙击镜资源。">
-        <meta http-equiv="content-language" content="zh-cn">
-    </head>
-    <body>
-        <div class="topnav">
-            <a href="/">首页</a>
-            <a href="/tools/index.html">工具</a>
-            <a href="/games/index.html">游戏</a>
-            <a href="/blogs/index.html">博客</a>
-            <a href="/files/index.html">文件</a>
-        </div>
-        <div class="header">
-            <img src="/media/logo.png" alt="logo" width="40px" height="40px" loading="lazy">
-            <h1>kirka准星</h1>
-            <input type="text" id="search" placeholder="搜索本站内容...">
-            <button id="theme-toggle">切换主题</button>
-            <div id="date">now_date</div>
-            <div id="time">now_time</div>
-            <p>准星与狙击镜资源目录。</p>
-        </div>
-        <div class="row">
-            <div class="fullcolumn">
-                <div class="card">
-                    <h2>页面入口</h2>
-                    <p>访问 kirka 准星素材页面。</p>
-                    <a href="/media/kirka_sinper_scope/index.html">打开准星资源页面</a>
-                </div>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>kirka准星 - xzy的网站</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/style.css">
+    <meta name="description" content="kirka 准星素材页面，展示准星与狙击镜资源。">
+    <meta property="og:title" content="kirka准星 - xzy的网站">
+    <meta property="og:description" content="kirka 游戏准星与狙击镜资源页面">
+    <meta property="og:type" content="website">
+</head>
+<body>
+    <!-- 此页面有意不在主导航中展示，但保留供直接 URL 访问，请勿删除 -->
+    <div id="site-nav"></div>
+    <div id="site-header"></div>
+
+    <div class="row">
+        <div class="fullcolumn">
+            <div class="card">
+                <h2>页面入口</h2>
+                <p>访问 kirka 准星素材页面。</p>
+                <a href="/media/kirka_sinper_scope/index.html">打开准星资源页面</a>
             </div>
         </div>
-        <div class="footer">
-            -xzy的网站-
-        </div>
-        <script src="/script.js" async></script>
-    </body>
+    </div>
+
+    <div id="site-footer"></div>
+    <script src="/components.js"></script>
+    <script src="/script.js"></script>
+</body>
 </html>

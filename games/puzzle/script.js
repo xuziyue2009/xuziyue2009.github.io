@@ -1,159 +1,156 @@
-const puzzleSize = 3;    
-const puzzleContainer = document.getElementById('puzzle');    
-// 创建一个包含1到8的数组    
-var numbers = Array.from({ length: puzzleSize * puzzleSize - 1 }, (_, i) => i + 1);    
-  
-function initPuzzle() {      
-      
-    // 随机打乱数组（不包括我们稍后手动添加的“空白”格子）    
-    numbers.sort(() => 0.5 - Math.random());    
-    numbers.push(0);
+/**
+ * 15-Puzzle (数字华容道) — 4×4 sliding puzzle
+ * Loaded by games/puzzle/index.html
+ */
+(function() {
+    'use strict';
 
-    refresh();   
-} 
+    var SIZE = 4;
+    var board = [];
+    var moveCount = 0;
+    var emptyRow = SIZE - 1;
+    var emptyCol = SIZE - 1;
+    var gameOver = false;
 
-function swap(a, b){
-    var tmp = numbers[a];
-    numbers[a] = numbers[b];
-    numbers[b] = tmp;
-    console.log(a,"to",b);
-}
+    var boardEl = document.getElementById('puzzle-board');
+    var moveCountEl = document.getElementById('move-count');
+    var msgEl = document.getElementById('puzzle-msg');
 
-function refresh(){
-    puzzleContainer.innerHTML = '';  
-    numbers.forEach((num, index) => {    
-        const row = Math.floor(index / puzzleSize); // 计算当前格子所在的行    
-        const col = index % puzzleSize; // 计算当前格子所在的列    
-  
-        const tile = document.createElement('div');    
-        tile.classList.add('tile');    
-        tile.textContent = num.toString(); // 将数字转换为字符串并显示  
-        if (num == 0){
-            tile.textContent = "";
+    function initBoard() {
+        board = [];
+        for (var r = 0; r < SIZE; r++) {
+            board[r] = [];
+            for (var c = 0; c < SIZE; c++) {
+                var val = r * SIZE + c + 1;
+                board[r][c] = val < SIZE * SIZE ? val : 0;
+            }
         }
-        tile.addEventListener('click', onTileClick);    
-        puzzleContainer.appendChild(tile);    
-    });    
-    check();
-}
-
-function check(){
-    for (var i = 0; i < 8; i+=1){
-        if (numbers[i] != i+1){
-            return 1;
-        }
-    }
-    success();
-    return 0;
-}
-
-function success(){
-    alert("success");
-}
-  
-function onTileClick(event) {  
-    const clickedTile = event.target;  
-    const clickedTileIndex = Array.from(puzzleContainer.children).indexOf(clickedTile);  
-    const clickedTileRow = Math.floor(clickedTileIndex / puzzleSize);  
-    const clickedTileCol = clickedTileIndex % puzzleSize;  
-  
-    console.log('Clicked tile:', clickedTile.textContent, 'Tileindex:', clickedTileIndex, 'at position:', clickedTileRow, clickedTileCol);  
-    
-    switch (clickedTileIndex){
-        case 0:
-            if (numbers[1] == 0){
-                swap(0,1);
-            }
-            else if (numbers[3] == 0){
-                swap(0,3);
-            }
-            break;
-        case 1:
-            if (numbers[0] == 0){
-                swap(1,0);
-            }
-            else if (numbers[2] == 0){
-                swap(1,2);
-            }
-            else if (numbers[4] == 0){
-                swap(1,4);
-            }
-            break;
-        case 2:
-            if (numbers[1] == 0){
-                swap(2,1);
-            }
-            else if (numbers[5] == 0){
-                swap(2,5);
-            }
-            break;
-        case 3:
-            if (numbers[0] == 0){
-                swap(3,0);
-            }
-            else if (numbers[4] == 0){
-                swap(3,4);
-            }
-            else if (numbers[6] == 0){
-                swap(3,6);
-            }
-            break;
-        case 4:
-            if (numbers[1] == 0){
-                swap(4,1);
-            }
-            else if (numbers[3] == 0){
-                swap(4,3);
-            }
-            else if (numbers[5] == 0){
-                swap(4,5);
-            }
-            else if (numbers[7] == 0){
-                swap(4,7);
-            }
-            break;
-        case 5:
-            if (numbers[2] == 0){
-                swap(5,2);
-            }
-            else if (numbers[4] == 0){
-                swap(5,4);
-            }
-            else if (numbers[8] == 0){
-                swap(5,8);
-            }
-            break;
-        case 6:
-            if (numbers[3] == 0){
-                swap(6,3);
-            }
-            else if (numbers[7] == 0){
-                swap(6,7);
-            }
-            break;
-        case 7:
-            if (numbers[6] == 0){
-                swap(7,6);
-            }
-            else if (numbers[4] == 0){
-                swap(7,4);
-            }
-            else if (numbers[8] == 0){
-                swap(7,8);
-            }
-            break;
-        case 8:
-            if (numbers[5] == 0){
-                swap(8,5);
-            }
-            else if (numbers[7] == 0){
-                swap(8,7);
-            }
-            break;
+        emptyRow = SIZE - 1;
+        emptyCol = SIZE - 1;
+        moveCount = 0;
+        gameOver = false;
+        if (msgEl) msgEl.textContent = '';
+        updateMoveDisplay();
     }
 
-    refresh();
-}  
-  
-initPuzzle();
+    function updateMoveDisplay() {
+        if (moveCountEl) moveCountEl.textContent = moveCount;
+    }
 
+    function render() {
+        if (!boardEl) return;
+        boardEl.innerHTML = '';
+        for (var r = 0; r < SIZE; r++) {
+            for (var c = 0; c < SIZE; c++) {
+                var tile = document.createElement('div');
+                tile.className = 'puzzle-tile';
+                if (board[r][c] === 0) {
+                    tile.classList.add('empty');
+                } else {
+                    tile.textContent = board[r][c];
+                }
+                tile.dataset.row = r;
+                tile.dataset.col = c;
+                tile.addEventListener('click', tileClick);
+                boardEl.appendChild(tile);
+            }
+        }
+    }
+
+    function isAdjacent(r1, c1, r2, c2) {
+        return (Math.abs(r1 - r2) + Math.abs(c1 - c2)) === 1;
+    }
+
+    function tileClick(e) {
+        if (gameOver) return;
+        var r = parseInt(e.currentTarget.dataset.row);
+        var c = parseInt(e.currentTarget.dataset.col);
+        if (board[r][c] === 0) return;
+
+        if (isAdjacent(r, c, emptyRow, emptyCol)) {
+            board[emptyRow][emptyCol] = board[r][c];
+            board[r][c] = 0;
+            emptyRow = r;
+            emptyCol = c;
+            moveCount++;
+            updateMoveDisplay();
+            render();
+            checkWin();
+        }
+    }
+
+    function getValidMoves() {
+        var moves = [];
+        var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+        for (var d = 0; d < dirs.length; d++) {
+            var nr = emptyRow + dirs[d][0];
+            var nc = emptyCol + dirs[d][1];
+            if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+                moves.push([nr, nc]);
+            }
+        }
+        return moves;
+    }
+
+    function applyMove(move) {
+        var r = move[0], c = move[1];
+        board[emptyRow][emptyCol] = board[r][c];
+        board[r][c] = 0;
+        emptyRow = r;
+        emptyCol = c;
+    }
+
+    function isSolved() {
+        for (var r = 0; r < SIZE; r++) {
+            for (var c = 0; c < SIZE; c++) {
+                var expected = r * SIZE + c + 1;
+                if (expected < SIZE * SIZE && board[r][c] !== expected) return false;
+            }
+        }
+        return board[SIZE-1][SIZE-1] === 0;
+    }
+
+    function checkWin() {
+        if (isSolved()) {
+            gameOver = true;
+            if (msgEl) msgEl.textContent = '🎉 恭喜！你用 ' + moveCount + ' 步完成了拼图！';
+        }
+    }
+
+    function shuffle() {
+        initBoard();
+        var lastMove = -1;
+        for (var i = 0; i < 200; i++) {
+            var moves = getValidMoves();
+            var move;
+            do {
+                move = moves[Math.floor(Math.random() * moves.length)];
+            } while (moves.length > 1 && move === lastMove);
+            lastMove = move;
+            applyMove(move);
+        }
+        if (isSolved()) {
+            var extra = getValidMoves();
+            applyMove(extra[0]);
+        }
+        moveCount = 0;
+        gameOver = false;
+        if (msgEl) msgEl.textContent = '';
+        updateMoveDisplay();
+        render();
+    }
+
+    function reset() {
+        initBoard();
+        render();
+    }
+
+    // Bind controls
+    var shuffleBtn = document.getElementById('puzzle-shuffle');
+    var resetBtn = document.getElementById('puzzle-reset');
+    if (shuffleBtn) shuffleBtn.addEventListener('click', shuffle);
+    if (resetBtn) resetBtn.addEventListener('click', reset);
+
+    initBoard();
+    render();
+})();

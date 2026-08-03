@@ -1,50 +1,38 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>kirka准星 - xzy的网站</title>
-        <link rel="shortcut icon" href="/favicon.ico">
-        <link rel="stylesheet" type="text/css" href="/style.css">
-        <meta name="description" content="kirka 准星素材页面，展示准星和狙击镜资源。">
-        <meta http-equiv="content-language" content="zh-cn">
-    </head>
-    <body>
-        <div class="topnav">
-            <a href="/">首页</a>
-            <a href="/tools/index.html">工具</a>
-            <a href="/games/index.html">游戏</a>
-            <a href="/blogs/index.html">博客</a>
-            <a href="/files/index.html">文件</a>
-        </div>
-        <div class="header">
-            <img src="/media/logo.png" alt="logo" width="40px" height="40px" loading="lazy">
-            <h1>kirka准星</h1>
-            <input type="text" id="search" placeholder="搜索本站内容...">
-            <button id="theme-toggle">切换主题</button>
-            <div id="date">now_date</div>
-            <div id="time">now_time</div>
-        </div>
-        <div class="row">
-            <div class="fullcolumn">
-                <h1>目录</h1>
-                <h2>crosshair（普通准星）</h2>
-                <a href="crosshair_1.png">crosshair_1</a>
-                <br>
-                <a href="crosshair_2.png">crosshair_2</a>
-                <br>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>kirka准星 - xzy的网站</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/style.css">
+    <meta name="description" content="kirka 准星素材页面，展示准星和狙击镜资源。">
+    <meta property="og:title" content="kirka准星 - xzy的网站">
+    <meta property="og:description" content="kirka 准星素材页面，展示准星和狙击镜资源">
+    <meta property="og:type" content="website">
+</head>
+<body>
+    <div id="site-nav"></div>
+    <div id="site-header"></div>
+
+    <div class="row">
+        <div class="fullcolumn">
+            <div class="card">
+                <h2>目录</h2>
+                <h3>crosshair（普通准星）</h3>
+                <a href="crosshair_1.png">crosshair_1</a><br>
+                <a href="crosshair_2.png">crosshair_2</a><br>
                 <a href="crosshair_3.png">crosshair_3</a>
-                <h2>sniperscope（狙击镜）</h2>
-                <a href="sniperscope_1.gif">sniperscope_1</a>
-                <br>
-                <a href="sniperscope_2.gif">sniperscope_2</a>
-                <br>
+                <h3>sniperscope（狙击镜）</h3>
+                <a href="sniperscope_1.gif">sniperscope_1</a><br>
+                <a href="sniperscope_2.gif">sniperscope_2</a><br>
                 <a href="sniperscope_3.png">sniperscope_3</a>
             </div>
         </div>
-        <div class="footer">
-            -xzy的网站-
-        </div>
-        <script src="/script.js" async></script>
-    </body>
+    </div>
+
+    <div id="site-footer"></div>
+    <script src="/components.js"></script>
+    <script src="/script.js"></script>
+</body>
 </html>

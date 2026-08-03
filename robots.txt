@@ -1,3 +1,4 @@
-user-agent: *
-disallow: /googleee2222916c831694.html
-disallow: /media/
+User-agent: *
+Disallow: /media/
+
+Sitemap: https://xuziyue2009.github.io/sitemap.xml

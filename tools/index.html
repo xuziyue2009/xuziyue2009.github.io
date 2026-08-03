@@ -1,80 +1,58 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>xzy的网站 - 小工具</title>
-        <link rel="shortcut icon" href="/favicon.ico">
-        <link rel="stylesheet" type="text/css" href="/style.css">
-        <meta name="description" content="xzy 的小工具合集，包含离子反应模拟、质数判断、分解质因数、设备可靠性历史记录。">
-        <meta http-equiv="content-language" content="zh-cn">
-    </head>
-    <body>
-        <div class="topnav">
-            <a href="/">首页</a>
-            <a href="/tools/index.html">工具</a>
-            <a href="/games/index.html">游戏</a>
-            <a href="/blogs/index.html">博客</a>
-            <a href="/files/index.html">文件</a>
-        </div>
-        <div class="header">
-            <img src="/media/logo.png" alt="logo" width="40px" height="40px">
-            <h1>小工具</h1>
-            <input type="text" id="search" placeholder="搜索本站内容...">
-            <button id="theme-toggle">切换主题</button>
-            <div id="date">now_date</div>
-            <div id="time">now_time</div>
-        </div>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>小工具 - xzy的网站</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/style.css">
+    <meta name="description" content="xzy 的小工具合集，包含离子反应模拟、质数判断、分解质因数、设备可靠性历史记录。">
+    <meta property="og:title" content="小工具 - xzy的网站">
+    <meta property="og:description" content="xzy 的小工具合集，包含离子反应模拟、质数判断、分解质因数、设备可靠性历史记录。">
+    <meta property="og:type" content="website">
+</head>
+<body>
+    <div id="site-nav"></div>
+    <div id="site-header"></div>
 
-        <div class="row">
-            <div class="fullcolumn">
-                <div class="card">
-                    <a href="aqsimbyhzh.html">
-                        <h2>离子反应模拟器</h2>
-                        <h5>2025/6/25</h5>
-                        <p>离子反应模拟 by.hzh</p>
-                    </a>
-                </div>
+    <div class="row">
+        <div class="fullcolumn">
+            <div class="card">
+                <a href="aqsimbyhzh.html">
+                    <h2>离子反应模拟器</h2>
+                    <h5>2025/6/25</h5>
+                    <p>离子反应模拟 by.hzh</p>
+                </a>
+            </div>
 
-                <div class="card">
-                    <a href="isprime.html">
-                        <h2>质数判断</h2>
-                        <h5>2024/3/11</h5>
-                        <p>判断一个数是不是质数</p>
-                    </a>
-                </div>
+            <div class="card">
+                <a href="isprime.html">
+                    <h2>质数判断</h2>
+                    <h5>2024/3/11</h5>
+                    <p>判断一个数是不是质数</p>
+                </a>
+            </div>
 
-                <div class="card">
-                    <a href="fenjie.html">
-                        <h2>分解质因数</h2>
-                        <h5>2024/3/11</h5>
-                        <p>把合数写成几个质数相乘的形式</p>
-                    </a>
-                </div>
-                
-                <div class="card">
-                    <a href="reliability-history.html">
-                        <h2>设备可靠性历史记录</h2>
-                        <h5>2026/7/28</h5>
-                        <p>仿Windows可靠性监视器，展示鼠标设备的稳定性变化与关键事件</p>
-                    </a>
-                </div>
+            <div class="card">
+                <a href="fenjie.html">
+                    <h2>分解质因数</h2>
+                    <h5>2024/3/11</h5>
+                    <p>把合数写成几个质数相乘的形式</p>
+                </a>
+            </div>
 
-                <!-- <div class="card">
-                    <a href="xxxx.html">
-                        <h2>标题1</h2>
-                        <h5>YYYY/MM/DD</h5>
-                        <div class="pic" style="height:200px;">图片</div>
-                        <p>介绍1</p>
-                        <p>介绍2</p>
-                    </a>
-                </div> -->
+            <div class="card">
+                <a href="reliability-history.html">
+                    <h2>设备可靠性历史记录</h2>
+                    <h5>2026/7/28</h5>
+                    <p>仿Windows可靠性监视器，展示鼠标设备的稳定性变化与关键事件</p>
+                </a>
             </div>
         </div>
+    </div>
 
-        <div class="footer">
-            -xzy的网站-
-        </div> 
-        <script src="/script.js" async></script>
-    </body>
+    <div id="site-footer"></div>
+    <script src="/components.js"></script>
+    <script src="/script.js"></script>
+</body>
 </html>
