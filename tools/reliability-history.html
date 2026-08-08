@@ -5,157 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>设备可靠性历史记录 - xzy的网站</title>
     <link rel="shortcut icon" href="/favicon.ico">
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/style.css?v=20260805">
     <meta name="description" content="仿Windows可靠性历史记录功能，展示鼠标设备稳定性指数变化，支持记录丢帧、滚轮回滚、按键双击等问题。">
     <meta property="og:title" content="设备可靠性历史记录 - xzy的网站">
     <meta property="og:description" content="仿Windows可靠性监视器，展示鼠标设备的稳定性变化与关键事件">
     <meta property="og:type" content="website">
-    <style>
-        .reliability-container { max-width: 960px; margin: 20px auto 0; }
-        .stats-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-        .stat-tile {
-            flex: 1; min-width: 120px; background: var(--surface);
-            border-radius: 12px; box-shadow: var(--shadow); padding: 16px 20px; text-align: center;
-        }
-        .stat-tile .stat-value { font-size: 1.8rem; font-weight: bold; color: var(--accent); }
-        .stat-tile .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
-        .stat-tile.good .stat-value { color: #4CAF50; }
-        .stat-tile.warn .stat-value { color: #F9A825; }
-        .stat-tile.bad .stat-value { color: #E74856; }
-        .monitor-card {
-            background: var(--surface); border-radius: 12px;
-            box-shadow: var(--shadow); padding: 24px; margin-bottom: 20px;
-        }
-        .monitor-card h2 { margin: 0 0 4px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
-        .monitor-card h2 .icon { font-size: 1.3rem; }
-        .monitor-card .subtitle { color: var(--muted); font-size: 0.85rem; margin: 0 0 16px; }
-        .chart-wrapper { position: relative; width: 100%; height: 300px; margin: 8px 0 0; }
-        .chart-wrapper canvas { width: 100%; height: 100%; display: block; }
-        .chart-tooltip {
-            display: none; position: absolute;
-            background: var(--surface-strong); color: var(--text);
-            border: 1px solid var(--border); border-radius: 8px;
-            padding: 10px 14px; font-size: 0.85rem;
-            pointer-events: none; z-index: 10; white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .chart-tooltip .tt-date { font-weight: bold; margin-bottom: 2px; }
-        .chart-tooltip .tt-score { color: var(--accent); }
-        .chart-tooltip .tt-events { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
-        .chart-legend { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 12px; font-size: 0.82rem; color: var(--muted); }
-        .chart-legend span { display: inline-flex; align-items: center; gap: 5px; }
-        .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
-        .legend-dot.critical { background: #E74856; }
-        .legend-dot.warning  { background: #F9A825; }
-        .legend-dot.info     { background: var(--accent); }
-        .report-area { text-align: center; margin-bottom: 20px; }
-        .btn-report {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 28px; font-size: 1rem; font-weight: 600;
-            border: 2px solid #E74856; border-radius: 10px;
-            background: #E74856; color: #fff; cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .btn-report:hover { background: #d1343f; border-color: #d1343f; transform: translateY(-1px); }
-        .btn-report:active { transform: translateY(0); }
-        .modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5); z-index: 1000;
-            align-items: center; justify-content: center;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal {
-            background: var(--surface); border-radius: 14px; padding: 28px;
-            max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .modal h3 { margin: 0 0 8px; font-size: 1.2rem; }
-        .modal .modal-sub { color: var(--muted); font-size: 0.85rem; margin: 0 0 20px; }
-        .modal label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
-        .issue-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
-        @media (max-width: 400px) { .issue-grid { grid-template-columns: 1fr; } }
-        .issue-option {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 12px; border: 2px solid var(--border); border-radius: 10px;
-            cursor: pointer; transition: all 0.15s ease; font-size: 0.88rem;
-        }
-        .issue-option:hover { border-color: var(--accent); background: var(--surface-strong); }
-        .issue-option.selected { border-color: var(--accent); background: var(--surface-strong); }
-        .issue-option .io-icon {
-            width: 28px; height: 28px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.8rem; font-weight: bold; color: #fff; flex-shrink: 0;
-        }
-        .issue-option .io-icon.critical { background: #E74856; }
-        .issue-option .io-icon.warning  { background: #F9A825; color: #333; }
-        .issue-option .io-icon.info     { background: var(--accent); }
-        .issue-option .io-impact { margin-left: auto; font-size: 0.75rem; color: var(--muted); }
-        .modal textarea {
-            width: 100%; padding: 10px 12px; border: 1px solid var(--border);
-            border-radius: 8px; background: var(--surface); color: var(--text);
-            font: inherit; resize: vertical; min-height: 60px; margin-bottom: 20px;
-        }
-        .modal textarea:focus { outline: none; border-color: var(--accent); }
-        .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
-        .btn {
-            padding: 10px 22px; border-radius: 8px; font-weight: 600;
-            border: none; cursor: pointer; font: inherit; transition: all 0.2s ease;
-        }
-        .btn-primary { background: #E74856; color: #fff; }
-        .btn-primary:hover { background: #d1343f; }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-cancel { background: var(--surface-strong); color: var(--text); border: 1px solid var(--border); }
-        .btn-cancel:hover { background: var(--border); }
-        .event-day-group { margin-bottom: 16px; }
-        .event-day-label {
-            font-weight: bold; font-size: 0.95rem; padding: 6px 0;
-            border-bottom: 1px solid var(--border); margin-bottom: 8px;
-        }
-        .event-item {
-            display: flex; align-items: flex-start; gap: 12px;
-            padding: 10px 12px; border-radius: 8px; transition: background 0.15s ease;
-        }
-        .event-item:hover { background: var(--surface-strong); }
-        .event-item .event-icon {
-            flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.85rem; font-weight: bold; color: #fff; margin-top: 2px;
-        }
-        .event-item .event-icon.critical { background: #E74856; }
-        .event-item .event-icon.warning  { background: #F9A825; color: #333; }
-        .event-item .event-icon.info     { background: var(--accent); }
-        .event-item .event-details { flex: 1; min-width: 0; }
-        .event-item .event-details .event-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
-        .event-item .event-details .event-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.4; }
-        .event-item .event-time { flex-shrink: 0; color: var(--muted); font-size: 0.82rem; }
-        .event-item .event-delete {
-            flex-shrink: 0; background: none; border: none; color: var(--muted);
-            cursor: pointer; font-size: 0.8rem; padding: 2px 6px; border-radius: 4px;
-            opacity: 0; transition: opacity 0.15s;
-        }
-        .event-item:hover .event-delete { opacity: 1; }
-        .event-item .event-delete:hover { color: #E74856; background: rgba(231,72,86,0.1); }
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
-        .empty-state .empty-icon { font-size: 3rem; margin-bottom: 12px; }
-        .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: #333; color: #fff; padding: 12px 24px; border-radius: 8px;
-            font-size: 0.9rem; z-index: 2000; pointer-events: none;
-            opacity: 0; transition: opacity 0.3s ease;
-        }
-        .toast.show { opacity: 1; }
-        @media (max-width: 600px) {
-            .monitor-card { padding: 14px; }
-            .chart-wrapper { height: 220px; }
-            .stats-row { gap: 8px; }
-            .stat-tile { padding: 12px 10px; }
-            .stat-tile .stat-value { font-size: 1.4rem; }
-            .event-item .event-time { display: none; }
-            .modal { padding: 16px; }
-        }
-    </style>
 </head>
 <body>
+    <noscript><div class="card" style="text-align:center;padding:40px;margin:20px"><p>请启用 JavaScript 以浏览本站。</p></div></noscript>
     <div id="site-nav"></div>
     <div id="site-header"></div>
 
@@ -180,11 +37,11 @@
         </div>
 
         <div class="report-area">
-            <button class="btn-report" id="btnOpenModal">⚠️ 记录鼠标问题</button>
+            <button class="btn-report" id="btnOpenModal"><svg viewBox="0 0 24 24" width="18" height="18"><polygon points="12,2 2,21 22,21" fill="#F9A825" stroke="#E65100" stroke-width="1.5" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="14" stroke="#333" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="17.5" r="1.2" fill="#333"/></svg> 记录鼠标问题</button>
         </div>
 
         <div class="monitor-card">
-            <h2><span class="icon">📊</span> 稳定性指数趋势</h2>
+            <h2><span class="icon"><svg viewBox="0 0 24 24" width="20" height="20"><rect x="2" y="13" width="5" height="9" rx="1" fill="currentColor" opacity=".45"/><rect x="9.5" y="7" width="5" height="15" rx="1" fill="currentColor" opacity=".7"/><rect x="17" y="3" width="5" height="19" rx="1" fill="currentColor"/></svg></span> 稳定性指数趋势</h2>
             <p class="subtitle">范围 1-10，正常使用时随时间对数恢复；发生问题则立即下降</p>
             <div class="chart-wrapper" id="chartWrapper">
                 <canvas id="stabilityChart"></canvas>
@@ -198,8 +55,8 @@
         </div>
 
         <div class="monitor-card">
-            <h2><span class="icon">📋</span> 详细事件记录</h2>
-            <p class="subtitle">所有问题记录与系统事件，按日期分组（可点击 ✕ 删除误报）</p>
+            <h2><span class="icon"><svg viewBox="0 0 24 24" width="20" height="20"><rect x="5" y="2" width="14" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8.5" y="1" width="7" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><line x1="8" y1="9" x2="16" y2="9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="8" y1="13" x2="16" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="8" y1="17" x2="12" y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span> 详细事件记录</h2>
+            <p class="subtitle">所有问题记录与系统事件，按日期分组（可点击 <svg viewBox="0 0 24 24" width="14" height="14"><line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg> 删除误报）</p>
             <div class="event-list" id="eventList"></div>
         </div>
     </div>
@@ -236,20 +93,41 @@
     var STORAGE_KEY = "reliability_data";
 
     var ISSUE_TYPES = [
-        { id: "frame_drop",      label: "鼠标丢帧",       impact: -1.5, severity: "warning",  icon: "!", desc: "指针移动不流畅、跳帧或卡顿" },
-        { id: "scroll_rollback", label: "滚轮回滚",       impact: -1.5, severity: "warning",  icon: "!", desc: "滚动时页面反向回弹" },
-        { id: "double_click",    label: "按键双击",       impact: -2.0, severity: "critical", icon: "✕", desc: "单击触发两次点击" },
-        { id: "disconnect",      label: "连接断开",       impact: -3.0, severity: "critical", icon: "✕", desc: "鼠标与接收器失去连接" },
-        { id: "driver_crash",    label: "驱动崩溃",       impact: -3.5, severity: "critical", icon: "✕", desc: "驱动程序无响应或报错" },
-        { id: "pointer_lag",     label: "指针延迟",       impact: -1.8, severity: "warning",  icon: "!", desc: "移动鼠标后指针明显滞后" },
-        { id: "side_button",     label: "侧键失灵",       impact: -1.3, severity: "warning",  icon: "!", desc: "侧键按下无反应或误触发" },
-        { id: "low_battery",     label: "电池不足",       impact: -0.8, severity: "info",     icon: "i", desc: "电量低于15%，影响性能" },
-        { id: "interference",    label: "信号干扰",       impact: -1.2, severity: "warning",  icon: "!", desc: "2.4GHz频段干扰导致不稳定" },
-        { id: "sensor_dirty",    label: "传感器脏污",     impact: -1.0, severity: "info",     icon: "i", desc: "移动轨迹异常或抖动" }
+        { id: "frame_drop",      label: "鼠标丢帧",       impact: -1.5, severity: "warning",  desc: "指针移动不流畅、跳帧或卡顿" },
+        { id: "scroll_rollback", label: "滚轮回滚",       impact: -1.5, severity: "warning",  desc: "滚动时页面反向回弹" },
+        { id: "double_click",    label: "按键双击",       impact: -2.0, severity: "critical", desc: "单击触发两次点击" },
+        { id: "disconnect",      label: "连接断开",       impact: -3.0, severity: "critical", desc: "鼠标与接收器失去连接" },
+        { id: "driver_crash",    label: "驱动崩溃",       impact: -3.5, severity: "critical", desc: "驱动程序无响应或报错" },
+        { id: "pointer_lag",     label: "指针延迟",       impact: -1.8, severity: "warning",  desc: "移动鼠标后指针明显滞后" },
+        { id: "side_button",     label: "侧键失灵",       impact: -1.3, severity: "warning",  desc: "侧键按下无反应或误触发" },
+        { id: "low_battery",     label: "电池不足",       impact: -0.8, severity: "info",     desc: "电量低于15%，影响性能" },
+        { id: "interference",    label: "信号干扰",       impact: -1.2, severity: "warning",  desc: "2.4GHz频段干扰导致不稳定" },
+        { id: "sensor_dirty",    label: "传感器脏污",     impact: -1.0, severity: "info",     desc: "移动轨迹异常或抖动" }
     ];
 
     var issueTypeMap = {};
     ISSUE_TYPES.forEach(function(t) { issueTypeMap[t.id] = t; });
+
+    // Resolve icon SVG at call time (components.js may not have loaded at parse time)
+    function getSeverityIcon(severity) {
+        var icons = window.__siteIcons || {};
+        if (severity === "critical") return icons.xmark || "✕";
+        if (severity === "warning") return icons.exclaim || "!";
+        return icons.info || "i";
+    }
+
+    function getStatusIcon(score) {
+        var icons = window.__siteIcons || {};
+        if (score >= 8) return icons.check || "✅";
+        if (score >= 6) return icons.warning || "⚠️";
+        return icons.cross || "❌";
+    }
+
+    function getStatusLabel(score) {
+        if (score >= 8) return "稳定";
+        if (score >= 6) return "一般";
+        return "不稳定";
+    }
 
     function loadData() {
         try {
@@ -467,7 +345,7 @@
             if (minDist < 30 && closest >= 0) {
                 var d = stabilityData[closest];
                 var px = pad.left + (closest / (n - 1)) * plotW;
-                var statusText = d.score >= 8 ? "✅ 稳定" : d.score >= 6 ? "⚠️ 一般" : "❌ 不稳定";
+                var statusText = getStatusIcon(d.score) + " " + getStatusLabel(d.score);
                 var eventLine = d.eventCount > 0 ? '<div class="tt-events">' + d.eventCount + ' 个事件</div>' : '<div class="tt-events">无特殊事件</div>';
                 tooltip.innerHTML = '<div class="tt-date">' + d.date + " " + statusText + '</div>' + '<div class="tt-score">指数：<b>' + d.score.toFixed(1) + '</b> / 10</div>' + eventLine;
                 var ttW = tooltip.offsetWidth;
@@ -487,7 +365,8 @@
     function buildEventList(events) {
         var container = document.getElementById("eventList");
         if (!events || events.length === 0) {
-            container.innerHTML = '<div class="empty-state"><div class="empty-icon">🖱️</div><p>暂无事件记录。点击上方按钮记录第一个问题。</p></div>';
+            var mouseIcon = (window.__siteIcons && window.__siteIcons.mouse) || '🖱️';
+            container.innerHTML = '<div class="empty-state"><div class="empty-icon">' + mouseIcon + '</div><p>暂无事件记录。点击上方按钮记录第一个问题。</p></div>';
             return;
         }
         var sorted = events.slice().sort(function(a, b) { return b.timestamp - a.timestamp; });
@@ -505,7 +384,7 @@
             html += '<div class="event-day-group"><div class="event-day-label">' + label + '</div>';
             groups[dateStr].forEach(function(ev) {
                 var iconClass = ev.severity;
-                var iconSymbol = ev.severity === "critical" ? "✕" : ev.severity === "warning" ? "!" : "i";
+                var iconSymbol = getSeverityIcon(ev.severity);
                 var timeStr = String(new Date(ev.timestamp).getHours()).padStart(2, "0") + ":" + String(new Date(ev.timestamp).getMinutes()).padStart(2, "0");
                 html += '<div class="event-item" data-id="' + ev.id + '">';
                 html += '<div class="event-icon ' + iconClass + '">' + iconSymbol + '</div>';
@@ -514,7 +393,7 @@
                 html += '<div class="event-desc">' + (ev.note || "") + '</div>';
                 html += '</div>';
                 html += '<div class="event-time">' + timeStr + '</div>';
-                html += '<button class="event-delete" data-id="' + ev.id + '" title="删除此记录">✕</button>';
+                html += '<button class="event-delete" data-id="' + ev.id + '" title="删除此记录">' + (window.__siteIcons && window.__siteIcons.xmark || "✕") + '</button>';
                 html += '</div>';
             });
             html += '</div>';
@@ -574,7 +453,7 @@
         var html = "";
         ISSUE_TYPES.forEach(function(t) {
             html += '<div class="issue-option" data-type="' + t.id + '">';
-            html += '<div class="io-icon ' + t.severity + '">' + t.icon + '</div>';
+            html += '<div class="io-icon ' + t.severity + '">' + getSeverityIcon(t.severity) + '</div>';
             html += '<div>' + t.label + '</div>';
             html += '<div class="io-impact">' + (t.impact >= 0 ? "+" : "") + t.impact.toFixed(1) + '</div>';
             html += '</div>';
@@ -674,13 +553,13 @@
 
     // Redraw on theme toggle — listen after components.js creates the button
     document.addEventListener("click", function(e) {
-        if (e.target && e.target.id === "theme-toggle") {
+        if (e.target && e.target.classList.contains("theme-toggle")) {
             setTimeout(function() { if (stabilityData.length > 0) resizeCanvas(); }, 300);
         }
     });
 })();
     </script>
-    <script src="/components.js"></script>
-    <script src="/script.js"></script>
+    <script src="/components.js?v=20260805"></script>
+    <script src="/script.js?v=20260805"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 /**
  * script.js — Global behaviours for xzy's website
  * Clock, theme toggle, client-side search.
- * Load AFTER components.js so #search / #theme-toggle / #date / #time exist.
+ * Load AFTER components.js so #search / .theme-toggle / #date / #time exist.
  */
 (function () {
     'use strict';
@@ -59,14 +59,29 @@
             document.body.classList.remove('dark');
             localStorage.setItem(THEME_STORAGE_KEY, 'light');
         }
+        updateThemeButtons();
+    }
+
+    function updateThemeButtons() {
+        var buttons = document.querySelectorAll('.theme-toggle');
+        var isDark = document.body.classList.contains('dark');
+        var icons = window.__siteIcons || {};
+        var sunSvg = icons.sun || '☀️';
+        var moonSvg = icons.moon || '🌙';
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].innerHTML = isDark ? sunSvg : moonSvg;
+            buttons[i].title = isDark ? '切换到浅色主题' : '切换到深色主题';
+        }
     }
 
     function setupThemeToggle() {
-        var btn = document.getElementById('theme-toggle');
-        if (!btn) return;
-        btn.addEventListener('click', function () {
-            setTheme(!document.body.classList.contains('dark'));
-        });
+        var buttons = document.querySelectorAll('.theme-toggle');
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].addEventListener('click', function () {
+                setTheme(!document.body.classList.contains('dark'));
+            });
+        }
+        updateThemeButtons();
     }
 
     /* ================================================================

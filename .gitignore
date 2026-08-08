@@ -1,0 +1,18 @@
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large binaries (tracked separately)
+# Add large files you don't want in git here
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
