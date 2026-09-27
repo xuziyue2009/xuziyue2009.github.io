@@ -1,0 +1,382 @@
+<phyphox version="1.16">
+  <title>声学频谱仪 · 用手机测声音频率辨认音阶</title>
+  <category>声学</category>
+  <icon format="base64">iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAN1wAADdcBQiibeAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAA2BSURBVHic7d1b7BxVAcfx35Reofxb2tJyKy13QlEhBUFA0chFNIiJAfESUIw8GYwRQjReMMQEH4zRB42XB0ETDfGBiyQSExQpLwRQLq0XEDRysxAgVSjBtl8fZtb//Gd3ZnZ2Z3Z2zv4+SbP//Xf+M2d297fnnJkzZyQzMzMzMzMzMzMzMzMzMzMzs8kDTgK2tl0Os6kE/IzYDuAGYFPbZTKbCsAc8BoL7QV+A1wBHNB2Gc1aA1xFsVeBW4DzgKjt8ppNFHBvSUDS/gHcBBzddrnNJiKpQe4D9lUIyl7gHuBKYGXb+2DWOGAjcD3wZIWgAOwGbgUuBvZrez/MGgdsBX4A7KoYlmeIm2DHt70PZo0DlgOXAncC/60YlgeBzwHr2t4Ps8YBhycf+EcqBuWNJGCXAkva3g+zxhE3wb4DvFgxLM8lf3dq2/tg1jhgGXHn/FbgzYph2U58UGB92/th1jhgDXA18FDFoOwhPmt/KbC07f0waxywhfho1gsVw/Iy8dGzc9reB7PGAfsRD1G5BXi9Ylg8cNJmB7CauAm2jepn7T1w0mYHcGJSOzxdsVZpZeAkHiFgbQAWAecQ9zv+UzEsExs4SXy9zDFNb8csF/F1KVckzamqTbBtxM23Axso1wbiUQTbgbm6129WGVM0cBK4LrX+24BFdazXrBa0PHASeCyz3m/UtW9mtaGFgZNJOLP2AR9raj/NxsaEBk4C381Zz27gjEnsq9lYaGjgJLAE2Fnw988DR0x6f81GQs0DJ4EPDfF3DwP7t7nfZpVRz8DJ24f8m1/i2V6sqxh94GQVX2l7P83GwngDJ8vsAz7S9j6a1QJYC3wWeKDGkLwOnNb2vpnVitEHTg7yLHBY2/tkVjvmB05WPbeSdT+wrO39MasdcT/lmTEDAnBz2/tiVjvgohrC0XNt2/tjVivg5zUGZA/wgbb3aVb5xFTNgNWSnpO0osbV7pL0jiiKdtS4ThuCr0mo32WqNxx7Je2UdFWN67QhLW67AAG6Yoy//bukHZIel7Q9efxTFEW7ayiXjcBNrBoBx0r6q8pf11cUB2F78viQpEeiKPp3syW0qlyD1OtKLQzHS5IeU6ZWiKLolRbKZiNwQOr1hqRrNB+EnS2Xx8zMbAT4Iqyx+TBv2Da2XYCuc0DC5mvdx+SAhO3wtgvQdQ5I2Da0XYCuc0DCdkjbBeg6ByRsDsiYHJCwuYk1JgckUMBySavbLkfXOSDh2l+S70MyJgckXCvkgIzNAQmXa5AaOCDh2l/SCnzj0LE4IOHqXfa7vNVSdJwDEq7eSF4HZAwOSLhWZB5LAXVONhEEByRco9QghzZRkC5zQMLVC0iVWsFDUzIckHCNUoM4IBkOSLhGOYrlJlaGAxKuSk0s4EBJBzRXnG5yQMJVtQbZIH8e+vgFCVfVTroDMoBfkHBVrUEOlj8PffyChKtqDXKwPFdzHwckXFUP866VPw99/IKEq+pQEwdkAL8g4erVIEuGXH6d3MTq44CEq1dzDHs9yNoKy84MByRcvRpk2Pd4jYavbWaGAxKuXkCGrRXm5PvF9HFAwlW1Blkp1yB9HJBwVe2DHCAHpI8DEq6qTayVchOrjwMSoGQmk6XJ09KAAIsU1zhLy5adNQ5ImNK3XhvmPZ5TfA7ENUiGAxKmdECGaWL1JphzHyTDAQlTenjJMAFZlTy6BslwQMK0MvWza5AxOCBhWpX6uUpA3EnPcEDClJ60epj3uBcoz8KY4YCEadQaZP/CpWaQAxKmdA1SJSCe1STDAQlTugYZ5j1emzx6bt4MByRMVWuQXkBcg2Q4IGFK37xzmIAclDy6D5LhgIRpXernYQLSW34F4MtuUxyQMK1N/TxMQNYkj5HcD1nAAQnTqAGR3MxawAEJU9WApJd3QFIckDCla4TCAYjAci1sVh3YSIk6ygEJDLBUCz/kZTXI2szzgwYuNaMckPBkP/BVA7Jm4FIzygEJz7rM87JrPLI1hmuQFAckPNnbqJXVINlAuQZJcUDCsyHzvKwGyQbCNUiKAxKe7J1qy2oQB6SAAxKeqjVINhBuYqV0NiCAR54O5hqkRp0NiPo7lxbL1iBll9FmA+IaJKXLATm47QJMqWwNUlbTugYp0OWArG+7AFMq+7qsHLjUvNWZ565BUjoZEGCJHJA+wGL1Nz2XJq9Xnr4z6cl6TB0NiOJmhOdw6rdeg9/TolokW2Mskvt3/9fVgBwqT5M5SLb/0TMwIEnNMuj/sh39mdXlgHiazH55zc68GiSvQ+6AJLoakCPlGmSQ7DisnrwjWdn+R48DkuhqQI6QAzJIXTWID4AkuhqQTXJABsnrg+QFIe+QrmuQRFcDslEOyCB5Ack7KuWAlOhqQI6QO+mD5H2w80YduJNeonMBSW5QeZg8TeYgR+T83jXIiDoXEMXhWCzPvjHI4Tm/z6tBHJASXQzIxuRxrnCpGQOsUf6cVlVrkIOTW0PPvC6+CA7IYIcV/F9eDZIdqNizWB60KKmbAdmUPLqJtVBe/0PKD09RCNzMUjcDsjl59DfcQnn9D0naACwb8Pui17BofTOjiwE5Knn0N9xCRTXIIs03TdOKXsOi9c2MLgfkoJxvxVlV9oHelH4CrNfCW7VlDQrUzOlUQJKbu6TfaNci84o66VImIJJOLVneNYg6FhDFQynSkxA4IPPKPtBHZZ6fVbK8axB1LyDZNzlv7NEsKutUn5R5/q6S5R0QdS8gmzPPs4GZScAK5V/b0bMltfwySWeULO8mlroXkGwgjmulFNNnmEOyx6QOapyu8nsRzgFloQte1wKyOfPcAYkNE5DFmq9FLhhyvceMVpxwdC0grkEGG7a/cGby+P4hlz96hLIEpWsB2Zx5vim55disG/as91nABpUf4u05dsTyBKMzAUmuAzky8+v9JJ3YQnGmTfZ1yXOepIs0/PvuGqTtAlSQdxVh2fH8WZA9CZhng6QvVliv+yBtF6CCt+b8/uyJlmI6DRsQSTq+oWWD1KWAnJbzewekWkCqOASY6Vn0QwjIUcDMntRKriRs8tqYkxtc99TrRECSDvrpBYu8d1JlmULDdtBHlde0nQmdCIikd6v4hjmfnEwxptLmhtfvGqQDLi/5/3OBLSXLhMo1SIOmPiDJ+KEPlywWSfr2BIozjZrqoPecCpTdpaoVk5h5ZeoDIukzGu6+eecDZTVNiJoOyBJJ72x4G6P6RNMbmOqAJN9cX67wJz+awaZW0wGRpPdMYBuVAHOSrmp6O1MdEElfULWrBldKugNoul0+FZKjeydMYFPnTWAbVV2qWb7TMbAVeIPRPAVMzTgioJF5hIEtI74+o3hLE/swKuAu4JmmtzOVNQiwStKtkkadteQoSQ8A59dXqtEAX5X0BJA3i+E4PtjAOvNcO8FtFSLunJ+lWbynO7AUuLOmb709wE3A8vItN7IvFwH7krLUepQN2A/4S02v0zD2AmeWl6x5wDGpcrXy3rYCWEZ94Uj7M3AJ8bRBk9qXo4GdqTK8CZRdB15l/Vc38DqV+RvQ+rc2cGGqTHn3ZQwLMAfc3fAb/ABw4QT25WTiflDW08QXLI27/uOAVxp+rfJso6E+VYX9T385ZGdrCQ/wduDJCb7J9wMfJ54NpM79WAN8i+KDC9sZIyTAkcQ1Ypv+CLR2rQhwXaos4Y7mJm5SfYm4+dGGV4HvA2cTHzIdZR8WAecm6xn2W/0JoGjwZd62LgSerf9lGMnLQNkIh0YAN6bKcXEbZWgUEAGXM7gZ0pYXgZ8S1ywDDxETd4yPBi4ArgduY2E/o4q9wM2UBIX5AN7OfId/mvwW2NrMJyX3Nbkptf1PN7mtiXVaJYn4iMPlkq7R8BMHtGWnpO2KD4WvUnxSar2auXnoPyVtk/SEpFcl7U22daLiC8K6MIPkvZJ+KOm2KIpeb3JDwNck3ZA8vSGKoq83ta3Gb6VMfORoq6TLJH1K+bcDmzbrk3+TsFHSRye0raacm/x7A7hH0v2S7pO0LYoiat7W7tTPjU6R2khAiE+KnS3pfZIuked5nSXLFc+71Zt76wngx5J+EkXRzpq2sSf1c6NXk44dEOKz3lsUX1hziqRzkudTeZbeJu44Sd+UdCPwa0m/kHRHFEWvjbHOdCuk0S/fgX0Q4lP5qxWfyk8/rlOc2CMVD+fYLE9ybNW9LulXku6SdHcURf8a9g+BJYr7hr1ZNXdFUVR0I6CxRMCDiidgm1Nco6yW7yBrk4OkP0i6W9KDkh6V9FQURfv6FoRNkr6n/qlTV0VRtKuJwkVA3R0os3G9JmmHpOckvam4X7NR0ts0uNVzchRF25soSONHscxGcICKZ7HJOkFxs6t27khbCE5pasUOiIWgsYC4D2IheEnSoVEU7SldsiLXIBaCdYrP4tfOAbFQfJ4G5u9yE8tCskvx+ZTfS/qdpO3jjgNzQCxkb0p6UtJDig8D75D0YBRFzw+7AgfEZtELkh5L/j2u+Oz9jiiKdmcXdEDMYnsVX4/zaPLvYUkPOCBmBXwUy6yAA2JWwAExK+CAmBVwQMwKOCBmBRwQswIOiFkBB8SsgANiVsABMSvggJgVcEDMCixWPG+qmZmZmZmZmZmZmZmZmZmZSdL/ADJDLz25M4vMAAAAAElFTkSuQmCC</icon>
+  <description>
+        用手机麦克风采集人声或乐器声，通过快速傅里叶变换（FFT）将声音从时间域转换为频率域，得到声音的频谱，
+        并自动识别出信号的峰值频率与对应的音符（音阶）。
+
+        原理：声音的音高由基频决定，频率越高音高越高。利用 FFT 可分解出声音包含的主要频率成分，
+        从而辨认音阶。
+  </description>
+  <link label="Wiki">http://phyphox.org/wiki/index.php?title=Experiment:_Audio_Spectrum</link>
+  <data-containers>
+    <container size="32768">recording</container>
+    <container>rate</container>
+    <container>rate/2</container>
+    <container size="32768">recording_remainder</container>
+    <container size="32768">recording_subrange</container>
+    <container init="2048">samples</container>
+    <container>actual_samples/2</container>
+    <container>actual_samples/2+1</container>
+    <container>actual_samples+1</container>
+    <container>actual_samples</container>
+    <container>period</container>
+    <container size="1">df</container>
+    <container size="32768">time</container>
+    <container size="32769">frequency</container>
+    <container size="32768">fftX</container>
+    <container size="32768">fftY</container>
+    <container size="16384">halfFrequency</container>
+    <container size="16384">halfFFTtempX</container>
+    <container size="16384">halfFFTtempY</container>
+    <container size="16384">fft</container>
+    <container size="0">f0</container>
+    <container size="0">t</container>
+    <container size="2">tnext</container>
+    <container>ratio</container>
+    <container static="true">log2</container>
+    <container>logRatio</container>
+    <container>log2Ratio</container>
+    <container>cents</container>
+    <container>semitones</container>
+    <container>semitonesRound</container>
+    <container>semitonesDiff</container>
+    <container>centsDiff</container>
+    <container size="1">resolutionRatio</container>
+    <container size="256">timeline</container>
+    <container size="4096">reducedf</container>
+    <container size="4096">reducedfft</container>
+    <container size="256">subf</container>
+    <container size="256">subfft</container>
+    <container size="32768">tmap</container>
+    <container size="32768">fmap</container>
+    <container size="32768">fftmap</container>
+    <container init="0">wnamplitude</container>
+  </data-containers>
+  <input>
+    <audio append="true">
+      <output>recording</output>
+      <output component="rate">rate</output>
+    </audio>
+  </input>
+  <output>
+    <audio loop="true">
+      <noise>
+        <input parameter="amplitude">wnamplitude</input>
+      </noise>
+    </audio>
+  </output>
+  <views>
+    <view label="频谱分析">
+      <value label="峰值频率" unit="[[unit_short_hertz]]">
+        <input>f0</input>
+      </value>
+      <separator height="1"/>
+      <value label="音符">
+        <input>semitonesRound</input>
+        <map max="-25">低</map>
+        <map max="-24">[[musical_note_a2]]</map>
+        <map max="-23">[[musical_note_bb2]]</map>
+        <map max="-22">[[musical_note_b2]]</map>
+        <map max="-21">[[musical_note_c3]]</map>
+        <map max="-20">[[musical_note_db3]]</map>
+        <map max="-19">[[musical_note_d3]]</map>
+        <map max="-18">[[musical_note_eb3]]</map>
+        <map max="-17">[[musical_note_e3]]</map>
+        <map max="-16">[[musical_note_f3]]</map>
+        <map max="-15">[[musical_note_gb3]]</map>
+        <map max="-14">[[musical_note_g3]]</map>
+        <map max="-13">[[musical_note_ab3]]</map>
+        <map max="-12">[[musical_note_a3]]</map>
+        <map max="-11">[[musical_note_bb3]]</map>
+        <map max="-10">[[musical_note_b3]]</map>
+        <map max="-9">[[musical_note_c4]]</map>
+        <map max="-8">[[musical_note_db4]]</map>
+        <map max="-7">[[musical_note_d4]]</map>
+        <map max="-6">[[musical_note_eb4]]</map>
+        <map max="-5">[[musical_note_e4]]</map>
+        <map max="-4">[[musical_note_f4]]</map>
+        <map max="-3">[[musical_note_gb4]]</map>
+        <map max="-2">[[musical_note_g4]]</map>
+        <map max="-1">[[musical_note_ab4]]</map>
+        <map max="0">[[musical_note_a4]]</map>
+        <map max="1">[[musical_note_bb4]]</map>
+        <map max="2">[[musical_note_b4]]</map>
+        <map max="3">[[musical_note_c5]]</map>
+        <map max="4">[[musical_note_db5]]</map>
+        <map max="5">[[musical_note_d5]]</map>
+        <map max="6">[[musical_note_eb5]]</map>
+        <map max="7">[[musical_note_e5]]</map>
+        <map max="8">[[musical_note_f5]]</map>
+        <map max="9">[[musical_note_gb5]]</map>
+        <map max="10">[[musical_note_g5]]</map>
+        <map max="11">[[musical_note_ab5]]</map>
+        <map max="12">[[musical_note_a5]]</map>
+        <map max="13">[[musical_note_bb5]]</map>
+        <map max="14">[[musical_note_b5]]</map>
+        <map max="15">[[musical_note_c6]]</map>
+        <map max="16">[[musical_note_db6]]</map>
+        <map max="17">[[musical_note_d6]]</map>
+        <map max="18">[[musical_note_eb6]]</map>
+        <map max="19">[[musical_note_e6]]</map>
+        <map max="20">[[musical_note_f6]]</map>
+        <map max="21">[[musical_note_gb6]]</map>
+        <map max="22">[[musical_note_g6]]</map>
+        <map max="23">[[musical_note_ab6]]</map>
+        <map max="24">[[musical_note_a6]]</map>
+        <map max="25">[[musical_note_bb6]]</map>
+        <map max="26">[[musical_note_b6]]</map>
+        <map max="27">[[musical_note_c7]]</map>
+        <map max="28">[[musical_note_db7]]</map>
+        <map max="29">[[musical_note_d7]]</map>
+        <map max="30">[[musical_note_eb7]]</map>
+        <map max="31">[[musical_note_e7]]</map>
+        <map max="32">[[musical_note_f7]]</map>
+        <map max="33">[[musical_note_gb7]]</map>
+        <map max="34">[[musical_note_g7]]</map>
+        <map max="35">[[musical_note_ab7]]</map>
+        <map min="35">高</map>
+      </value>
+      <value label="与音符偏差（音分）">
+        <input>centsDiff</input>
+      </value>
+      <separator height="1"/>
+      <graph label="傅里叶变换频谱" logX="true" logY="true" labelX="频率" unitX="[[unit_short_hertz]]" labelY="振幅" unitY="[[unit_short_arbitrary_unit]]">
+        <input axis="x">halfFrequency</input>
+        <input axis="y">fft</input>
+      </graph>
+      <separator height="1" precision="0"/>
+      <value label="采样数" precision="0">
+        <input>actual_samples</input>
+      </value>
+      <value label="周期" unit="[[unit_short_milli_second]]" precision="2" factor="1000">
+        <input>period</input>
+      </value>
+      <value label="分辨率" unit="[[unit_short_hertz]]" precision="2">
+        <input>df</input>
+      </value>
+    </view>
+    <view label="历史记录">
+      <graph label="傅里叶变换频谱" logZ="true" labelX="频率" unitX="[[unit_short_hertz]]" labelY="时间" unitY="[[unit_short_second]]" labelZ="振幅" unitZ="[[unit_short_arbitrary_unit]]" aspectRatio="1" style="map" mapWidth="256" partialUpdate="true">
+        <input axis="x">fmap</input>
+        <input axis="y">tmap</input>
+        <input axis="z">fftmap</input>
+      </graph>
+      <graph label="峰值频率历史" timeOnX="true" labelX="时间" unitX="[[unit_short_second]]" labelY="峰值频率" unitY="[[unit_short_hertz]]" partialUpdate="true" style="dots">
+        <input axis="x">t</input>
+        <input axis="y">f0</input>
+      </graph>
+    </view>
+    <view label="设置">
+      <info label="设置傅里叶变换使用的采样数。更多采样＝更新更慢，但频谱分辨率更高。"/>
+      <dropdown label="采样数">
+        <output>samples</output>
+        <map value="2048">2048</map>
+        <map value="4096">4096</map>
+        <map value="8192">8192</map>
+        <map value="16384">16384</map>
+        <map value="32768">32768</map>
+      </dropdown>
+      <separator height="0.5"/>
+      <separator color="white"/>
+      <separator height="0.5"/>
+      <info label="白噪声发生器（可能较响，请先调低音量）。"/>
+      <toggle label="白噪声">
+        <output>wnamplitude</output>
+      </toggle>
+    </view></views>
+  <analysis requireFill="recording" requireFillDynamic="samples">
+    <formula formula="[1]+[2]/[3]">
+      <input clear="false">t</input>
+      <input clear="false">samples</input>
+      <input clear="false">rate</input>
+      <output clear="true">tnext</output>
+    </formula>
+    <timer>
+      <output clear="false">tnext</output>
+    </timer>
+    <max>
+      <input as="y">tnext</input>
+      <output as="max" clear="false">t</output>
+    </max>
+    <const>
+      <input as="value" clear="false">t</input>
+      <input as="length" type="value">256</input>
+      <output>timeline</output>
+    </const>
+    <subrange>
+      <input clear="false" as="to">samples</input>
+      <input as="in" clear="false">recording</input>
+      <output>recording_subrange</output>
+    </subrange>
+    <subrange>
+      <input clear="false" as="from">samples</input>
+      <input as="in" clear="true">recording</input>
+      <output>recording_remainder</output>
+    </subrange>
+    <subrange>
+      <input>recording_remainder</input>
+      <output>recording</output>
+    </subrange>
+    <count>
+      <input clear="false">recording_subrange</input>
+      <output>actual_samples</output>
+    </count>
+    <add>
+      <input clear="false">actual_samples</input>
+      <input type="value">1</input>
+      <output>actual_samples+1</output>
+    </add>
+    <divide>
+      <input clear="false">actual_samples</input>
+      <input type="value">2</input>
+      <output>actual_samples/2</output>
+    </divide>
+    <add>
+      <input clear="false">actual_samples/2</input>
+      <input type="value">1</input>
+      <output>actual_samples/2+1</output>
+    </add>
+    <divide>
+      <input clear="false">actual_samples</input>
+      <input clear="false">rate</input>
+      <output>period</output>
+    </divide>
+    <divide>
+      <input type="value">1</input>
+      <input clear="false">period</input>
+      <output>df</output>
+    </divide>
+    <divide>
+      <input clear="false">rate</input>
+      <input type="value">2</input>
+      <output>rate/2</output>
+    </divide>
+    <ramp>
+      <input as="start" type="value">0</input>
+      <input as="stop" clear="false">period</input>
+      <input as="length" clear="false">actual_samples+1</input>
+      <output>time</output>
+    </ramp>
+    <ramp>
+      <input as="start" type="value">0</input>
+      <input as="stop" clear="false">rate/2</input>
+      <input as="length" clear="false">actual_samples/2+1</input>
+      <output>frequency</output>
+    </ramp>
+    <fft>
+      <input clear="false">recording_subrange</input>
+      <output as="re">fftX</output>
+      <output as="im">fftY</output>
+    </fft>
+    <subrange>
+      <input type="value" as="from">1</input>
+      <input clear="false" as="to">actual_samples/2</input>
+      <input as="in">frequency</input>
+      <input as="in">fftX</input>
+      <input as="in">fftY</input>
+      <output>halfFrequency</output>
+      <output>halfFFTtempX</output>
+      <output>halfFFTtempY</output>
+    </subrange>
+    <formula formula="sqrt([1_]*[1_]+[2_]*[2_])">
+      <input>halfFFTtempX</input>
+      <input>halfFFTtempY</input>
+      <output>fft</output>
+    </formula>
+    <max>
+      <input as="y" clear="false">fft</input>
+      <input as="x" clear="false">halfFrequency</input>
+      <output as="position" clear="false">f0</output>
+    </max>
+    <divide>
+      <input clear="false">f0</input>
+      <input type="value">440</input>
+      <output>ratio</output>
+    </divide>
+    <log>
+      <input type="value">2</input>
+      <output>log2</output>
+    </log>
+    <log>
+      <input>ratio</input>
+      <output>logRatio</output>
+    </log>
+    <divide>
+      <input>logRatio</input>
+      <input clear="false">log2</input>
+      <output>log2Ratio</output>
+    </divide>
+    <multiply>
+      <input>log2Ratio</input>
+      <input type="value">1200</input>
+      <output>cents</output>
+    </multiply>
+    <divide>
+      <input clear="false">cents</input>
+      <input type="value">100</input>
+      <output>semitones</output>
+    </divide>
+    <round>
+      <input clear="false">semitones</input>
+      <output>semitonesRound</output>
+    </round>
+    <subtract>
+      <input clear="false">semitones</input>
+      <input clear="false">semitonesRound</input>
+      <output>semitonesDiff</output>
+    </subtract>
+    <multiply>
+      <input clear="false">semitonesDiff</input>
+      <input type="value">100</input>
+      <output>centsDiff</output>
+    </multiply>
+    <divide>
+      <input clear="false">actual_samples</input>
+      <input type="value">2048</input>
+      <output>resolutionRatio</output>
+    </divide>
+    <reduce averageY="true" averageX="true">
+      <input clear="false" as="factor">resolutionRatio</input>
+      <input clear="false" as="x">halfFrequency</input>
+      <input clear="false" as="y">fft</input>
+      <output as="x" clear="true">reducedf</output>
+      <output as="y" clear="true">reducedfft</output>
+    </reduce>
+    <subrange>
+      <input as="from" type="value">0</input>
+      <input as="to" type="value">256</input>
+      <input as="in">reducedf</input>
+      <input as="in">reducedfft</input>
+      <output>subf</output>
+      <output>subfft</output>
+    </subrange>
+    <append>
+      <input clear="false">timeline</input>
+      <output clear="false">tmap</output>
+    </append>
+    <append>
+      <input clear="false">subf</input>
+      <output clear="false">fmap</output>
+    </append>
+    <append>
+      <input clear="false">subfft</input>
+      <output clear="false">fftmap</output>
+    </append>
+  </analysis>
+  <export>
+    <set name="FFT 频谱">
+      <data name="频率 (Hz)">halfFrequency</data>
+      <data name="绝对振幅 (a.u.)">fft</data>
+    </set>
+    <set name="峰值频率历史">
+      <data name="时间 (s)">t</data>
+      <data name="峰值频率">f0</data>
+    </set>
+    <set name="原始数据">
+      <data name="时间 (s)">time</data>
+      <data name="波形 (a.u.)">recording_subrange</data>
+    </set>
+  </export>
+</phyphox>
